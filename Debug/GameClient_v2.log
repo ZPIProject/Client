@@ -1,0 +1,6 @@
+﻿  GameManager.cpp
+c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\gamemanager.cpp(32): warning C4101: 'mouse': unreferenced local variable
+c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\gamemanager.cpp(146): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\gamemanager.cpp(147): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  GameClient_v2.vcxproj -> C:\Users\Zilow\Documents\Visual Studio 2015\Projects\GameClient_v2\Debug\GameClient_v2.exe
+  GameClient_v2.vcxproj -> C:\Users\Zilow\Documents\Visual Studio 2015\Projects\GameClient_v2\Debug\GameClient_v2.pdb (Partial PDB)
