@@ -48,14 +48,26 @@ void GameManager::loging_menu()
 {
 	std::string username;
 	std::string password;
-	std::string ip_address;
-	std::cout << "Podaj ip serwera: ";
-	std::cin >> ip_address;
-	//	std::cout << "/nPodaj haslo: ";
-		//std::cin >> password;
 
-	if (network_handler->connect(ip_address))
-	{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
+	std::cout << "Czy chcesz odpaliæ klienta z po³¹czeniem do serwera(yes) lub bez (no) ";
+	std::cin >> password;
+	password == "no" ? want_to_run_with_connection_to_server = false : want_to_run_with_connection_to_server = true;
+	if (want_to_run_with_connection_to_server)
+	{
+		std::string ip_address;
+		std::cout << "\nPodaj ip serwera: ";
+		std::cin >> ip_address;
+		//	std::cout << "/nPodaj haslo: ";
+			//std::cin >> password;
+
+		if (network_handler->connect(ip_address))
+		{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
+			change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
+			main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
+		}
+	}
+	else
+	{
 		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
 		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 	}
@@ -127,8 +139,11 @@ void GameManager::game_in_progress()
 		logic_handler();
 		frame_rate_controller.restart();
 	}
-	pack_all_and_send();
-	recive_and_unpack_all();
+	if (want_to_run_with_connection_to_server)
+	{
+		pack_all_and_send();
+		recive_and_unpack_all();
+	}
 	draw();
 }
 

@@ -9,6 +9,8 @@ class GameManager
 {
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
+	bool want_to_run_with_connection_to_server;
+
 	sf::RenderWindow main_window;
 	sf::Clock frame_rate_controller;
 	
