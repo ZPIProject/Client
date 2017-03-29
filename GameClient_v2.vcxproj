@@ -118,16 +118,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\GameClient\Player.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="NetworkHandler.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\GameClient\Player.h" />
     <ClInclude Include="ConstantValues.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="NetworkHandler.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

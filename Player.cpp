@@ -1,5 +1,5 @@
 #include "Player.h"
-#include <iostream>
+
 
 
 Player::Player(sf::Color players_color)
