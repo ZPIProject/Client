@@ -1,0 +1,19 @@
+﻿  Source.cpp
+c:\users\master\desktop\zpi\client\constantvalues.h(6): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Player.cpp
+c:\users\master\desktop\zpi\client\constantvalues.h(6): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\master\desktop\zpi\client\player.cpp(22): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\master\desktop\zpi\client\player.cpp(32): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\master\desktop\zpi\client\player.cpp(43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\master\desktop\zpi\client\player.cpp(45): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\master\desktop\zpi\client\player.cpp(47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\master\desktop\zpi\client\player.cpp(49): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\master\desktop\zpi\client\player.cpp(56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  NetworkHandler.cpp
+  GameManager.cpp
+c:\users\master\desktop\zpi\client\constantvalues.h(6): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\master\desktop\zpi\client\gamemanager.cpp(32): warning C4101: 'mouse': unreferenced local variable
+c:\users\master\desktop\zpi\client\gamemanager.cpp(161): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\master\desktop\zpi\client\gamemanager.cpp(162): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  Generating Code...
+sfml-graphics-d.lib(sfml-graphics-d-2.dll) : fatal error LNK1112: module machine type 'X86' conflicts with target machine type 'x64'
