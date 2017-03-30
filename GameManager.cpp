@@ -13,7 +13,7 @@ void GameManager::draw()
 
 	main_window.draw(local_player->getShape());
 	main_window.draw(non_local_player->getShape());
-	
+	main_window.draw(Pattern.getArray());
 	main_window.display();
 }
 
@@ -24,6 +24,12 @@ void GameManager::event_handler()
 	{
 		if (event.type == sf::Event::Closed)
 			main_window.close();
+		else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
+		{			is_pattern_drawn = true;		}
+		else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
+			is_pattern_drawn = false;
+
+		}
 	}
 }
 
@@ -40,22 +46,44 @@ void GameManager::logic_handler()
 		directionY = -1;
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		directionY = 1;
+
 	local_player->rotate(main_window.mapPixelToCoords(sf::Mouse::getPosition(main_window)));
 	local_player->move(directionX, directionY);
+	managePattern();
+}
+
+void GameManager::managePattern()
+{
+	if (sf::Mouse::getPosition(main_window).x >= 0 && sf::Mouse::getPosition(main_window).y >= 0 && sf::Mouse::getPosition(main_window).x < main_window.getSize().x, sf::Mouse::getPosition(main_window).y < main_window.getSize().y)
+		Pattern.manage_pattern(sf::Mouse::getPosition(main_window).x, sf::Mouse::getPosition(main_window).y, is_pattern_drawn);	
+	
+	
 }
 
 void GameManager::loging_menu()
 {
 	std::string username;
 	std::string password;
-	std::string ip_address;
-	std::cout << "Podaj ip serwera: ";
-	std::cin >> ip_address;
-	//	std::cout << "/nPodaj haslo: ";
-		//std::cin >> password;
 
-	if (network_handler->connect(ip_address))
-	{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
+	std::cout << "Czy chcesz odpaliæ klienta z po³¹czeniem do serwera(yes) lub bez (no) ";
+	std::cin >> password;
+	password == "no" ? want_to_run_with_connection_to_server = false : want_to_run_with_connection_to_server = true;
+	if (want_to_run_with_connection_to_server)
+	{
+		std::string ip_address;
+		std::cout << "\nPodaj ip serwera: ";
+		std::cin >> ip_address;
+		//	std::cout << "/nPodaj haslo: ";
+			//std::cin >> password;
+
+		if (network_handler->connect(ip_address))
+		{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
+			change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
+			main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
+		}
+	}
+	else
+	{
 		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
 		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 	}
@@ -71,7 +99,12 @@ void GameManager::connecting_to_game()
 }
 GameManager::GameManager()
 {
+
+	//Do rysowania znaków
+	Pattern = Pattern_management(WINDOW_WIDTH, WINDOW_HEIGHT); //new empty array of points connected to form a line
+
 	game_is_running = true;
+	is_pattern_drawn = false;
 	players_initialization();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
 	current_game_state = LOGING_MENU;
@@ -127,8 +160,11 @@ void GameManager::game_in_progress()
 		logic_handler();
 		frame_rate_controller.restart();
 	}
-	pack_all_and_send();
-	recive_and_unpack_all();
+	if (want_to_run_with_connection_to_server)
+	{
+		pack_all_and_send();
+		recive_and_unpack_all();
+	}
 	draw();
 }
 
