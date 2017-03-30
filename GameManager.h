@@ -5,8 +5,11 @@
 #include "Player.h"
 #include "ConstantValues.h"
 #include "NetworkHandler.h"
+#include "Pattern_management.h"
 class GameManager
 {
+	bool is_pattern_drawn;
+	Pattern_management Pattern;
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
 	bool want_to_run_with_connection_to_server;
@@ -27,7 +30,7 @@ class GameManager
 	void draw();
 	void event_handler();
 	void logic_handler();
-
+	void managePattern();
 	void loging_menu();
 	void connecting_to_server();
 	void main_menu();

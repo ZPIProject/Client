@@ -1,11 +1,8 @@
-﻿  Source.cpp
-c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\constantvalues.h(6): warning C4305: 'initializing': truncation from 'double' to 'float'
-  NetworkHandler.cpp
-  GameManager.cpp
-c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\constantvalues.h(6): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\gamemanager.cpp(32): warning C4101: 'mouse': unreferenced local variable
-c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\gamemanager.cpp(161): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\zilow\documents\visual studio 2015\projects\gameclient_v2\gamemanager.cpp(162): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-  Generating Code...
-  GameClient_v2.vcxproj -> C:\Users\Zilow\documents\visual studio 2015\Projects\GameClient_v2\Debug\GameClient_v2.exe
-  GameClient_v2.vcxproj -> C:\Users\Zilow\documents\visual studio 2015\Projects\GameClient_v2\Debug\GameClient_v2.pdb (Partial PDB)
+﻿  GameManager.cpp
+c:\users\master\desktop\zpi\client\constantvalues.h(6): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\master\desktop\zpi\client\gamemanager.cpp(38): warning C4101: 'mouse': unreferenced local variable
+c:\users\master\desktop\zpi\client\gamemanager.cpp(57): warning C4018: '<': signed/unsigned mismatch
+c:\users\master\desktop\zpi\client\gamemanager.cpp(182): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\master\desktop\zpi\client\gamemanager.cpp(183): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  GameClient_v2.vcxproj -> C:\Users\Master\Desktop\ZPI\Client\Debug\GameClient_v2.exe
+  GameClient_v2.vcxproj -> C:\Users\Master\Desktop\ZPI\Client\Debug\GameClient_v2.pdb (Partial PDB)
