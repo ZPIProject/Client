@@ -13,7 +13,7 @@ void GameManager::draw()
 
 	main_window.draw(local_player->getShape());
 	main_window.draw(non_local_player->getShape());
-	main_window.draw(Pattern.getArray());
+	
 	main_window.display();
 }
 
@@ -24,12 +24,6 @@ void GameManager::event_handler()
 	{
 		if (event.type == sf::Event::Closed)
 			main_window.close();
-		else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
-		{			is_pattern_drawn = true;		}
-		else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
-			is_pattern_drawn = false;
-
-		}
 	}
 }
 
@@ -46,18 +40,8 @@ void GameManager::logic_handler()
 		directionY = -1;
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		directionY = 1;
-
 	local_player->rotate(main_window.mapPixelToCoords(sf::Mouse::getPosition(main_window)));
 	local_player->move(directionX, directionY);
-	managePattern();
-}
-
-void GameManager::managePattern()
-{
-	if (sf::Mouse::getPosition(main_window).x >= 0 && sf::Mouse::getPosition(main_window).y >= 0 && sf::Mouse::getPosition(main_window).x < main_window.getSize().x, sf::Mouse::getPosition(main_window).y < main_window.getSize().y)
-		Pattern.manage_pattern(sf::Mouse::getPosition(main_window).x, sf::Mouse::getPosition(main_window).y, is_pattern_drawn);	
-	
-	
 }
 
 void GameManager::loging_menu()
@@ -99,12 +83,7 @@ void GameManager::connecting_to_game()
 }
 GameManager::GameManager()
 {
-
-	//Do rysowania znaków
-	Pattern = Pattern_management(WINDOW_WIDTH, WINDOW_HEIGHT); //new empty array of points connected to form a line
-
 	game_is_running = true;
-	is_pattern_drawn = false;
 	players_initialization();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
 	current_game_state = LOGING_MENU;
