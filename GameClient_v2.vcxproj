@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="NetworkHandler.cpp" />
+    <ClCompile Include="Pattern_management.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
@@ -127,6 +128,7 @@
     <ClInclude Include="ConstantValues.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="NetworkHandler.h" />
+    <ClInclude Include="Pattern_management.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
