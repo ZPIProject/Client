@@ -27,9 +27,12 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Pattern_management.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+=======
+>>>>>>> master
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -44,8 +47,11 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Pattern_management.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+=======
+>>>>>>> master
   </ItemGroup>
 </Project>
