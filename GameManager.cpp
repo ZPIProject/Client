@@ -1,5 +1,6 @@
 #include "GameManager.h"
-
+#include "Trap.h"
+#include "Shield.h"
 
 
 void GameManager::change_game_state(Game_states state)
@@ -9,7 +10,7 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window.clear();
+	//main_window.clear();
 
 	main_window.draw(local_player->getShape());
 	main_window.draw(non_local_player->getShape());
@@ -36,7 +37,6 @@ void GameManager::event_handler()
 void GameManager::logic_handler()
 {
 	sf::Mouse mouse;
-
 	int directionX = 0, directionY = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		directionX = -1;
@@ -46,6 +46,17 @@ void GameManager::logic_handler()
 		directionY = -1;
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		directionY = 1;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+		std::cout << "Space pressed.";
+		//Shield shield = Shield();
+	//	main_window.draw(shield->getShape());
+	}
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+		std::cout << "LMB pressed.";
+		Trap trap = Trap(static_cast<sf::Vector2f>(sf::Mouse::getPosition(main_window)));
+		main_window.draw(trap.getShape());
+	}
 
 	local_player->rotate(main_window.mapPixelToCoords(sf::Mouse::getPosition(main_window)));
 	local_player->move(directionX, directionY);

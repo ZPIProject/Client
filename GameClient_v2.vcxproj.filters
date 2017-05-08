@@ -6,6 +6,8 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Pattern_management.cpp" />
+    <ClCompile Include="Shield.cpp" />
+    <ClCompile Include="Trap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConstantValues.h" />
@@ -13,5 +15,7 @@
     <ClInclude Include="NetworkHandler.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pattern_management.h" />
+    <ClInclude Include="Shield.h" />
+    <ClInclude Include="Trap.h" />
   </ItemGroup>
 </Project>
