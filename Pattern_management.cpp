@@ -1,4 +1,48 @@
 #include "Pattern_management.h"
+#include "SCSRv2.h"
+
+double Pattern_management::initializeNetwork()
+{
+	try
+	{
+
+		if (!mclInitializeApplication(nullptr, 0))
+		{
+			std::cerr << "Could not initialize the application properly."
+				<< std::endl;
+			system("pause");
+			return -3;
+		}
+
+		if (!mclmcrInitialize())
+		{
+			std::cerr << "Could not initialize MATLAB runtime properly."
+				<< std::endl;
+			system("pause");
+			return -2;
+		}
+
+		if (!SCSRv2Initialize())
+		{
+			std::cerr << "Could not initialize the library properly."
+				<< std::endl;
+			system("pause");
+			return -1;
+		}
+		mclmcrInitialize();
+
+		
+
+		
+	}
+	catch (mwException e)
+	{
+		std::cerr << e.what() << std::endl;
+		e.print_stack_trace();
+
+		return -1;
+	}
+}
 
 void Pattern_management::draw_Line(int x, int y)
 {
@@ -18,7 +62,7 @@ void Pattern_management::draw_Line(int x, int y)
 	}
 }
 
-void Pattern_management::pattern_close()
+double Pattern_management::pattern_close()
 {
 	lastx = lasty = -1;
 	for (sf::Vector2i V: Points) {
@@ -31,10 +75,17 @@ void Pattern_management::pattern_close()
 	Pattern = sf::Image();
 	Pattern.create(Window_X, Window_Y, sf::Color::Black);
 	points_on_screen.clear();
+	mwArray result(1, 1, mxDOUBLE_CLASS);			//parametr z wynikiem
+	std::string path("TEST.png"); //sciezka obrazka 800x600 czarno-bialego
+	mwArray picturepath(path.c_str());	//parametr ze sciezka obrazka
+	FinalPredict(1, result, picturepath);
+	lastx = lasty = -1;
+
+	return result;
+}
 	
 
-	lastx = lasty = -1;
-}
+	
 
 void Pattern_management::draw_point(int x, int y)
 {
@@ -76,20 +127,24 @@ void Pattern_management::resize(int minx, int miny, int maxx, int maxy)
 	
 }
 
-void Pattern_management::manage_pattern(int x, int y, bool Io)
+double Pattern_management::manage_pattern(int x, int y, bool Io)
 {
 	if (isOpen) {
 		if (!Io) {
-			pattern_close();
-			isOpen = Io;
+			double res = pattern_close();
+			isOpen = false;
+			return res;
+
 		}
 		else {
 			addPoint(x, y);
+			return -1.0;
 		}
 	}
 	else if (Io) {
 			pattern_open(x, y);
 			isOpen = Io;
+			return -1.0;
 		
 	}
 }
@@ -104,11 +159,12 @@ Pattern_management::Pattern_management(int x, int y)
 	isOpen = false;
 	Points = std::vector<sf::Vector2i>();
 	points_on_screen = sf::VertexArray(sf::LineStrip);
+	initializeNetwork();
 }
 
 Pattern_management::Pattern_management()
 {
-
+	initializeNetwork();
 }
 
 

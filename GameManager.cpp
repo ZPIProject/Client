@@ -1,6 +1,4 @@
 #include "GameManager.h"
-#include "Trap.h"
-#include "Shield.h"
 
 
 void GameManager::change_game_state(Game_states state)
@@ -10,7 +8,7 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	//main_window.clear();
+	main_window.clear();
 
 	main_window.draw(local_player->getShape());
 	main_window.draw(non_local_player->getShape());
@@ -54,8 +52,6 @@ void GameManager::logic_handler()
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 		std::cout << "LMB pressed.";
-		Trap trap = Trap(static_cast<sf::Vector2f>(sf::Mouse::getPosition(main_window)));
-		main_window.draw(trap.getShape());
 	}
 
 	local_player->rotate(main_window.mapPixelToCoords(sf::Mouse::getPosition(main_window)));
@@ -65,8 +61,10 @@ void GameManager::logic_handler()
 
 void GameManager::managePattern()
 {
-	if (sf::Mouse::getPosition(main_window).x >= 0 && sf::Mouse::getPosition(main_window).y >= 0 && sf::Mouse::getPosition(main_window).x < main_window.getSize().x, sf::Mouse::getPosition(main_window).y < main_window.getSize().y)
-		Pattern.manage_pattern(sf::Mouse::getPosition(main_window).x, sf::Mouse::getPosition(main_window).y, is_pattern_drawn);	
+	if (sf::Mouse::getPosition(main_window).x >= 0 && sf::Mouse::getPosition(main_window).y >= 0 && sf::Mouse::getPosition(main_window).x < main_window.getSize().x, sf::Mouse::getPosition(main_window).y < main_window.getSize().y) {
+		double P_Double = Pattern.manage_pattern(sf::Mouse::getPosition(main_window).x, sf::Mouse::getPosition(main_window).y, is_pattern_drawn);
+		if(P_Double > 0) std::cout << P_Double<<std::endl ;
+	}
 	
 	
 }

@@ -8,6 +8,7 @@
 
 class Pattern_management {
 private:
+	double initializeNetwork();
 	bool isOpen;
 	std::vector<sf::Vector2i> Points;
 	unsigned int Window_X;
@@ -15,7 +16,7 @@ private:
 	unsigned int minx, miny, maxx, maxy;
 	int lastx, lasty;
 	void draw_Line(int x, int y);
-	void pattern_close();
+	double pattern_close();
 	void draw_point(int x,int y);
 	void addPoint(int x, int y);
 	void pattern_open(int x,int y);
@@ -27,7 +28,7 @@ private:
 
 
 public:
-	void manage_pattern(int x, int y, bool Io);
+	double manage_pattern(int x, int y, bool Io);
 	Pattern_management(int x, int y);
 	Pattern_management();
 	void set_folder(int i) {
