@@ -8,25 +8,16 @@ double Pattern_management::initializeNetwork()
 
 		if (!mclInitializeApplication(nullptr, 0))
 		{
-			std::cerr << "Could not initialize the application properly."
-				<< std::endl;
-			system("pause");
 			return -3;
 		}
 
 		if (!mclmcrInitialize())
 		{
-			std::cerr << "Could not initialize MATLAB runtime properly."
-				<< std::endl;
-			system("pause");
 			return -2;
 		}
 
 		if (!SCSRv2Initialize())
 		{
-			std::cerr << "Could not initialize the library properly."
-				<< std::endl;
-			system("pause");
 			return -1;
 		}
 		mclmcrInitialize();
