@@ -1,14 +1,24 @@
 #include "Player.h"
+#include "Ball.h"
+#include "Shield.h"
+#include "Trap.h"
 
 
-
-Player::Player(sf::Color players_color)
+Player::Player(sf::Color players_color, float player_size) : ColidableObject(new CircleCollider(player_size/2))
 {
 	player_shape.setPosition(sf::Vector2f(0, 0));
 	player_shape.setFillColor(players_color);
-	player_shape.setSize(sf::Vector2f(PLAYER_SIZE,PLAYER_SIZE));
-	player_shape.setOrigin(sf::Vector2f(PLAYER_SIZE/2, PLAYER_SIZE/2));
-	speed = 1.5;
+	player_shape.setSize(sf::Vector2f(player_size, player_size));
+	player_shape.setOrigin(sf::Vector2f(player_size /2, player_size /2));
+	speed = 1.5; // daæ to jako parametr i ewentualnie daæ metode setColor
+
+	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
+	{
+		circle->setPosition(player_shape.getPosition());
+		//std::cout << "Player_constructor: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
+	}
+	
+
 }
 
 
@@ -20,6 +30,11 @@ Player::~Player()
 void Player::setPosition(double x, double y)
 {
 	player_shape.setPosition(x, y);
+	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
+	{
+		circle->setPosition(player_shape.getPosition());
+	//	std::cout << "Player_setPosition: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
+	}
 }
 
 void Player::setPosition(sf::Vector2f position)
@@ -49,11 +64,19 @@ void Player::move_to_mouse(int directionX, int directionY)
 		player_shape.move(speed*sinus, speed*(-cosinus));
 		//player_shape.setPosition(playerPosition.x + speed*sinus, playerPosition.y + speed*(-cosinus));
 		//dzia³a tak samo jak player_shape.move(speed*sinus, speed*(-cosinus));
+
+	
 }
 
 void Player::move(int directionX, int directionY)
 {
 	player_shape.move(speed*(directionX), speed*(directionY));
+
+	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
+	{
+		circle->setPosition(player_shape.getPosition());
+		//std::cout << "Player_movement: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
+	}
 }
 
 void Player::rotate(sf::Vector2f mousePosition)
@@ -92,4 +115,20 @@ sf::RectangleShape Player::getShape()
 double Player::getSpeed()
 {
 	return speed;
+}
+
+void Player::onCollision(ColidableObject* object)
+{
+
+	if (Ball* ball = dynamic_cast<Ball*>(object))
+	{
+		std::cout << "Ball hitted player\n";
+
+		//obs³uga kolizji z ball'em
+	}
+	else if (Trap* trap = dynamic_cast<Trap*>(object))
+	{
+		std::cout << "Trap hitted player\n";
+		//obs³uga kolizji z trap'em
+	}
 }

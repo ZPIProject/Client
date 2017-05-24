@@ -24,9 +24,7 @@ void NetworkHandler::send_packet(sf::Packet packet_to_send)
 sf::Packet NetworkHandler::recive_packet()
 {
 	sf::Packet recived_packet;
-	if (tcp_socket.receive(recived_packet) == sf::Socket::Done)
-		std::cout << "Data recived succesfull\n";
-	else
+	if (tcp_socket.receive(recived_packet) != sf::Socket::Done)
 		std::cout << "Faild to recive data\n";
 
 	return recived_packet;
