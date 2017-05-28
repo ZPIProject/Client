@@ -1,8 +1,13 @@
 #include "GameManager.h"
-#include "Trap.h"
-#include "Shield.h"
-#include "Ball.h"
-#include "ColidableObject.h"
+#include "Spell_Headers\Trap.h"
+#include "Spell_Headers\Shield.h"
+#include "Spell_Headers\Ball.h"
+#include "Collider_Headers\ColidableObject.h"
+#include <iomanip>
+
+#include <thread>
+
+
 
 void GameManager::change_game_state(Game_states state)
 {
@@ -88,79 +93,10 @@ void GameManager::logic_handler()
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		directionY = 1;
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
-	{
-		active_spell = 1;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
-	{
-		active_spell = 2;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
-	{
-		active_spell = 3;
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
-	{
-		active_element = 0;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::U))
-	{
-		active_element = 1;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
-	{
-		active_element = 2;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
-	{
-		active_element = 3;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-	{
-		active_element = 4;
-	}
+	
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-		if (active_spell == 1 && ball_cooldown.getElapsedTime().asMilliseconds() > 500)
-		{
-			//Ball_stats configuration
-			float damage = 10;
-			float speed = PROJECTAIL_STANDARD_SPEED;
-			float radius = 10;
-			Element e = (Element)active_element;
-
-			sf::Vector2f fixed_ball_position = sf::Vector2f(local_player->getPosition().x, local_player->getPosition().y - 50);
-			Ball ball = Ball(fixed_ball_position, Ball_stats(e,damage,speed,radius));
-			ball.on_cast_set_direction(local_player->getShape().getRotation());
-			balls_vector.push_back(ball);
-			balls_to_send.push_back(ball);
-
-			ball_cooldown.restart();
-		}
-		if (active_spell == 2 && trap_cooldown.getElapsedTime().asMilliseconds() > 500)
-		{
-			//Trap_stats configuration
-			Element e = (Element)active_element;
-			float radius = 5;
-			float duration = 10.0f;
-		
-			Trap trap = Trap(sf::Mouse::getPosition(main_window), Trap_stats(e, duration, radius));
-			trap_vector.push_back(trap);
-			traps_to_send.push_back(trap);
-
-			trap_cooldown.restart();
-		}
-		if (active_spell == 3 && !local_shield.has_ended())
-		{
-			Element e = (Element)active_element;
-			float radius = SHIELD_RADIUS;
-			float duration = 30.0f;
-
-			local_shield = Shield(local_player->getPosition(), Shield_stats(e,duration,radius));
-
-		}
+		cast_spell();
 	}
 
 	local_player->rotate(main_window.mapPixelToCoords(sf::Mouse::getPosition(main_window)));
@@ -195,11 +131,67 @@ void GameManager::logic_handler()
 void GameManager::managePattern()
 {
 	if (sf::Mouse::getPosition(main_window).x >= 0 && sf::Mouse::getPosition(main_window).y >= 0 && sf::Mouse::getPosition(main_window).x < main_window.getSize().x, sf::Mouse::getPosition(main_window).y < main_window.getSize().y) {
-		double P_Double = Pattern.manage_pattern(sf::Mouse::getPosition(main_window).x, sf::Mouse::getPosition(main_window).y, is_pattern_drawn);
-		if (P_Double > 0) std::cout << P_Double << std::endl;
+		double P_Double= Pattern.manage_pattern(sf::Mouse::getPosition(main_window).x, sf::Mouse::getPosition(main_window).y, is_pattern_drawn);
+		if(P_Double>0)std::cout << P_Double<<std::endl;
+		setActiveSpellData(P_Double);
 	}
 
 
+}
+void GameManager::cast_spell()
+{
+	if(active_spell>0 && active_element>0){
+		if (active_spell == 7 && ball_cooldown.getElapsedTime().asMilliseconds() > 500)
+		{
+			//Ball_stats configuration
+			float damage = 10;
+			float speed = PROJECTILE_STANDARD_SPEED;
+			float radius = 10;
+			Element e = (Element)active_element;
+
+			sf::Vector2f fixed_ball_position = sf::Vector2f(local_player->getPosition().x, local_player->getPosition().y - 50);
+			Ball ball = Ball(fixed_ball_position, Ball_stats(e, damage, speed, radius));
+			ball.on_cast_set_direction(local_player->getShape().getRotation());
+			balls_vector.push_back(ball);
+			balls_to_send.push_back(ball);
+
+			ball_cooldown.restart();
+		}
+		if (active_spell == 8 && trap_cooldown.getElapsedTime().asMilliseconds() > 500)
+		{
+			//Trap_stats configuration
+			Element e = (Element)active_element;
+			float radius = 5;
+			float duration = 10.0f;
+
+			Trap trap = Trap(sf::Mouse::getPosition(main_window), Trap_stats(e, duration, radius));
+			trap_vector.push_back(trap);
+			traps_to_send.push_back(trap);
+
+			trap_cooldown.restart();
+		}
+		if (active_spell == 3 && !local_shield.has_ended())
+		{
+			Element e = (Element)active_element;
+			float radius = SHIELD_RADIUS;
+			float duration = 30.0f;
+
+			local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
+		}
+		active_spell = active_element = 0;
+	}
+
+}
+void GameManager::setActiveSpellData(double value)
+{
+	if (value > 0) {
+		if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8)
+			active_spell = (int)value;
+		else
+			active_element = (int)value;
+		std::cout << active_spell << " " << active_element << std::endl;
+	}
+	
 }
 
 void GameManager::loging_menu()
@@ -210,7 +202,7 @@ void GameManager::loging_menu()
 
 	std::cout << "Czy chcesz odpaliæ klienta z po³¹czeniem do serwera(tak) lub bez (nie) ";
 	std::cin >> ip_adress;
-	want_to_run_with_connection_to_server = ip_adress == "nie";
+	want_to_run_with_connection_to_server = ip_adress == "tak";
 	if (want_to_run_with_connection_to_server)
 	{
 		std::cout << "\nPodaj ip serwera: ";
@@ -336,12 +328,13 @@ void GameManager::disconnect()
 
 void GameManager::players_initialization()
 {
-	local_player = new Player(sf::Color::Red, PLAYER_SIZE);
+	Player_stats stats(3, 3, 3, 3, 3, 3, 3,3,3,"Valium");
+	local_player = new Player(sf::Color::Red, PLAYER_SIZE,stats);
 	int local_player_position_x = (WINDOW_WIDTH - local_player->getShape().getSize().x) / 2;
 	int local_player_position_y = (WINDOW_HEIGHT - local_player->getShape().getSize().y);
 	local_player->setPosition(local_player_position_x, local_player_position_y);
 
-	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE);
+	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE,stats);
 	non_local_player->setPosition(400, 60);
 
 
@@ -404,7 +397,7 @@ void GameManager::unpack_ball_objects(sf::Packet & recived_packet)
 		sf::Vector2f fixed_ball_position;
 		fixed_ball_position.x = WINDOW_WIDTH - PLAYER_SIZE / 2 - start_position_x;
 		fixed_ball_position.y = WINDOW_HEIGHT - PLAYER_SIZE / 2 - start_position_y;
-		std::cout << "reciving: " << start_position_x << " " << start_position_y << " " << rotation << " " << speed << " " << radius << " " << element << "\n";
+		//std::cout << "reciving: " << start_position_x << " " << start_position_y << " " << rotation << " " << speed << " " << radius << " " << element << "\n";
 		Ball b = Ball(fixed_ball_position, Ball_stats(Element(element), 10, speed, radius));
 		b.on_cast_set_direction(non_local_player->getShape().getRotation());
 		b.setSpeed(-speed);
@@ -417,7 +410,7 @@ void GameManager::pack_shield_object(sf::Packet & packet_to_send)
 {
 	int element = (int)local_shield.get_statistics().get_element();
 	float radius = local_shield.get_statistics().get_radius();
-	std::cout << "radius: " << radius << " element: " << element << "\n";
+	//std::cout << "radius: " << radius << " element: " << element << "\n";
 	packet_to_send << local_shield.getPosition().x << local_shield.getPosition().y << element << radius;
 }
 

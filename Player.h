@@ -1,13 +1,14 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 #include "ConstantValues.h"
-#include "ColidableObject.h"
+#include "Collider_Headers\ColidableObject.h"
+#include "Player_stats.h"
 
 
 class Player : public ColidableObject 
 {
 public:
-	Player(sf::Color players_color, float player_size);
+	Player(sf::Color players_color, float player_size,Player_stats stts);
 	~Player();
 	
 	void setPosition(double x, double y);
@@ -20,12 +21,11 @@ public:
 
 	sf::Vector2f getPosition();
 	sf::RectangleShape getShape();
-	double getSpeed();
 	
 	void onCollision(ColidableObject* object);
 
 private:
 	sf::RectangleShape player_shape;
-	double speed;
+	Player_stats stats;
 };
 

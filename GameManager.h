@@ -3,14 +3,14 @@
 
 
 #include "Player.h"
-#include "Trap.h"
-#include "Shield.h"
-#include "Ball.h"
+#include "Spell_Headers\Trap.h"
+#include "Spell_Headers\Ball.h"
+#include "Spell_Headers\Shield.h"
 
 #include "ConstantValues.h"
 #include "NetworkHandler.h"
 #include "Pattern_management.h"
-#include "CollisionHandler.h"
+#include "Collider_Headers\CollisionHandler.h"
 
 class GameManager
 {
@@ -37,6 +37,7 @@ class GameManager
 	sf::Clock ball_cooldown;
 	sf::Clock trap_cooldown;
 	
+	void setActiveSpellData(double value);
 
 
 	NetworkHandler* network_handler;
@@ -56,7 +57,7 @@ class GameManager
 	void event_handler();
 	void logic_handler();
 	void managePattern();
-
+	void cast_spell();
 	void loging_menu();
 	void connecting_to_server();
 	void main_menu();

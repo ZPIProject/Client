@@ -129,15 +129,16 @@ double Pattern_management::manage_pattern(int x, int y, bool Io)
 		}
 		else {
 			addPoint(x, y);
-			return -1.0;
+			return -1;
 		}
 	}
 	else if (Io) {
 			pattern_open(x, y);
 			isOpen = Io;
-			return -1.0;
+			return -1;
 		
 	}
+	return -1;
 }
 
 Pattern_management::Pattern_management(int x, int y)
