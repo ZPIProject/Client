@@ -192,21 +192,22 @@ void GameManager::loging_menu()
 
 
 		if (network_handler->connect(ip_adress))
-		{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
+		{
 			sf::Packet login_information_to_send;
 			login_information_to_send << 0 << username << password; //0 = LOGIN_PACKET
 
 			network_handler->send_packet(login_information_to_send);
-			std::cout << "wys³ano pakiet\n";
+			std::cout << "wysłano pakiet\n";
 			sf::Packet recived = network_handler->recive_packet();
 			std::cout << "odebrano pakiet\n";
-			bool logged;
+			bool logged = true;
 			recived >> logged;
 			std::cout << "logged:" << logged << "\n";
+		
 			if (logged)
 			{
-				change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
-				main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
+				current_username = username;
+				change_game_state(CHARACTER_SELECTION);
 			}
 		}
 	}
@@ -216,8 +217,38 @@ void GameManager::loging_menu()
 		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 	}
 }
-void GameManager::connecting_to_server()
+
+void GameManager::character_selection(std::string nick)
 {
+	sf::Packet packet_with_nick;
+	sf::Packet character_name_list;
+
+	packet_with_nick << 5 /*Character_list packet*/ << nick;
+
+	network_handler->send_packet(packet_with_nick);
+	character_name_list = network_handler->recive_packet();
+
+	int characters_count;
+	std::string character_name;
+	character_name_list >> characters_count;
+	std::cout << "Available characters: ";
+	std::vector<std::string> character_list;
+	for (int i = 0; i < characters_count; i++)
+	{
+		character_name_list >> character_name;
+		std::cout << character_name << " ";
+		character_list.push_back(character_name);
+	}
+
+	std::cout << "\nPick character by name: ";
+	std::cin >> character_name;
+	auto result = std::find(character_list.begin(), character_list.end(), character_name);
+	if (result != character_list.end())
+	{
+		//tutaj powinno byc local player initialization;
+		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
+		change_game_state(GAME_IN_PROGRES);
+	}
 }
 void GameManager::main_menu()
 {
