@@ -28,6 +28,7 @@ class GameManager
 
 	Shield local_shield;
 	Shield non_local_shield;
+	std::vector<Shield> shield_to_send;
 
 	std::vector<Ball> balls_vector;
 	std::vector<Ball> balls_to_send;
@@ -75,8 +76,8 @@ class GameManager
 	void pack_ball_objects(sf::Packet& packet_to_send);
 	void unpack_ball_objects(sf::Packet& recived_packet);
 
-	void pack_trap_objects(sf::Packet& packet_to_send) {};
-	void unpack_trap_objects(sf::Packet& recived_packet) {};
+	void pack_trap_objects(sf::Packet& packet_to_send);
+	void unpack_trap_objects(sf::Packet& recived_packet);
 
 	void pack_shield_object(sf::Packet& packet_to_send);
 	void unpack_shield_object(sf::Packet& packet_to_send);
