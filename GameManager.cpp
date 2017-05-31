@@ -17,28 +17,6 @@ void GameManager::change_game_state(Game_states state)
 void GameManager::draw()
 {
 	main_window.clear(sf::Color(50,120,50));
-	/*std::vector<ColidableObject*> objects_to_draw = collision_handler.get_all_objects();
-	for (int i = 0; i < objects_to_draw.size(); i++)
-	{
-		if (Player* player = dynamic_cast<Player*>(objects_to_draw[i]))
-		{
-			main_window.draw(player->getShape());
-		}
-		if (Ball* ball = dynamic_cast<Ball*>(objects_to_draw[i]))
-		{
-			main_window.draw(ball->getShape());
-		}
-		if (Shield* shield = dynamic_cast<Shield*>(objects_to_draw[i]))
-		{
-			main_window.draw(shield->getShape());
-		}
-		if (Trap* trap = dynamic_cast<Trap*>(objects_to_draw[i]))
-		{
-			main_window.draw(trap->getShape()); 
-		}
-
-	}*/
-
 	
 	main_window.draw(local_player->getShape());
 	main_window.draw(non_local_player->getShape());
@@ -170,13 +148,14 @@ void GameManager::cast_spell()
 
 			trap_cooldown.restart();
 		}
-		if (active_spell == 3 && !local_shield.has_ended())
+		if (active_spell == 3 && local_shield.has_ended())
 		{
 			Element e = (Element)active_element;
 			float radius = SHIELD_RADIUS;
 			float duration = 30.0f;
 
-			local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
+			local_shield = Shield(local_player->getPosition(), Shield_stats(e,duration,radius));
+			shield_to_send.push_back(local_shield);
 		}
 		active_spell = active_element = 0;
 	}
@@ -200,7 +179,7 @@ void GameManager::loging_menu()
 	std::string username;
 	std::string password;
 
-	std::cout << "Czy chcesz odpaliæ klienta z po³¹czeniem do serwera(tak) lub bez (nie) ";
+	std::cout << "Czy chcesz odpaliÃ¦ klienta z poÂ³Â¹czeniem do serwera(tak) lub bez (nie) ";
 	std::cin >> ip_adress;
 	want_to_run_with_connection_to_server = ip_adress == "tak";
 	if (want_to_run_with_connection_to_server)
@@ -214,12 +193,12 @@ void GameManager::loging_menu()
 
 
 		if (network_handler->connect(ip_adress))
-		{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
+		{// tutaj sprawdzanie czy hasÂ³o zostaÂ³o poprawnie wprowadzone i czy username jest z nim zgodne
 			sf::Packet login_information_to_send;
 			login_information_to_send << 0 << username << password; //0 = LOGIN_PACKET
 
 			network_handler->send_packet(login_information_to_send);
-			std::cout << "wys³ano pakiet\n";
+			std::cout << "wysÂ³ano pakiet\n";
 			sf::Packet recived = network_handler->recive_packet();
 			std::cout << "odebrano pakiet\n";
 			bool logged;
@@ -227,14 +206,14 @@ void GameManager::loging_menu()
 			std::cout << "logged:" << logged << "\n";
 			if (logged)
 			{
-				change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
+				change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu Â³aczenie do gry
 				main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 			}
 		}
 	}
 	else
 	{
-		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
+		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu Â³aczenie do gry
 		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 	}
 }
@@ -250,16 +229,16 @@ void GameManager::connecting_to_game()
 GameManager::GameManager()
 {
 
-	//Do rysowania znaków
+	//Do rysowania znakÃ³w
 	Pattern = Pattern_management(WINDOW_WIDTH, WINDOW_HEIGHT); //new empty array of points connected to form a line
 
 	game_is_running = true;
 	is_pattern_drawn = false;
 	players_initialization();
-	//ustawienie stanu pocz¹tkowego gry(menu logowania)
+	//ustawienie stanu poczÂ¹tkowego gry(menu logowania)
 	current_game_state = LOGING_MENU;
 
-	//inicjalizacja obs³ugi sieci
+	//inicjalizacja obsÂ³ugi sieci
 	network_handler = new NetworkHandler(PORT);
 }
 GameManager::~GameManager()
@@ -338,7 +317,7 @@ void GameManager::players_initialization()
 	non_local_player->setPosition(400, 60);
 
 
-	//dodanie obiektów do collision_handler;
+	//dodanie obiektÃ³w do collision_handler;
 	//collision_handler.add_object(*non_local_player);
 	//collision_handler.add_object(*local_player);
 }
@@ -406,27 +385,76 @@ void GameManager::unpack_ball_objects(sf::Packet & recived_packet)
 	}
 }
 
+void GameManager::pack_trap_objects(sf::Packet & packet_to_send)
+{
+	int trap_objects_to_send = traps_to_send.size();
+	packet_to_send << trap_objects_to_send;
+	for (int i = 0; i < trap_objects_to_send; i++)
+	{
+		float position_x = traps_to_send[i].getPosition().x;
+		float position_y = traps_to_send[i].getPosition().y;
+
+		Trap_stats stats = traps_to_send[i].getStatistics();
+
+		packet_to_send << position_x << position_y << stats.get_radius() << (int)stats.get_element();
+	}
+	traps_to_send.clear();
+}
+
+void GameManager::unpack_trap_objects(sf::Packet & recived_packet)
+{
+	int trap_objects_count;
+	recived_packet >> trap_objects_count;
+	for (int i = 0; i < trap_objects_count; i++)
+	{
+		float position_x;
+		float position_y;
+		float radius;
+		int element;
+
+		recived_packet >> position_x >> position_y >> radius >> element;
+		
+		Trap_stats stats = Trap_stats((Element)element, 0, radius);
+		sf::Vector2i fixed_trap_position;
+		fixed_trap_position.x = WINDOW_WIDTH - position_x;
+		fixed_trap_position.y = WINDOW_HEIGHT - position_y;
+		Trap trap = Trap(fixed_trap_position, stats);
+		trap_vector.push_back(trap);
+	}
+}
+
 void GameManager::pack_shield_object(sf::Packet & packet_to_send)
 {
-	int element = (int)local_shield.get_statistics().get_element();
-	float radius = local_shield.get_statistics().get_radius();
-	//std::cout << "radius: " << radius << " element: " << element << "\n";
-	packet_to_send << local_shield.getPosition().x << local_shield.getPosition().y << element << radius;
+	int shield_to_send_size = shield_to_send.size();
+	packet_to_send << shield_to_send_size;
+	if (shield_to_send.size() == 1)
+	{
+		int element = (int)local_shield.get_statistics().get_element();
+		float radius = local_shield.get_statistics().get_radius();
+		//std::cout << "radius: " << radius << " element: " << element << "\n";
+		packet_to_send << element << radius;
+	}
+	shield_to_send.clear();
 }
 
 void GameManager::unpack_shield_object(sf::Packet & recived_packet)
 {
 	float shield_position_x, shield_position_y, shield_radius;
-	int element;
+	int recived_shield, element;
 
-	recived_packet >> shield_position_x >> shield_position_y >> element >> shield_radius;
+	recived_packet >> recived_shield;
+	if (recived_shield == 1)
+	{
+		recived_packet >> element >> shield_radius;
 
-	Element e = (Element)element;
-	sf::Vector2f shield_position;
-	shield_position.x = WINDOW_WIDTH - shield_position_x;
-	shield_position.y = WINDOW_HEIGHT - shield_position_y;
-	std::cout << "shield recived: " << element << " " << shield_radius << "\b";
-	non_local_shield = Shield(shield_position, Shield_stats(e, 10, SHIELD_RADIUS));
+		Element e = (Element)element;
+		sf::Vector2f shield_position;
+		shield_position.x = non_local_player->getPosition().x;
+		shield_position.y = non_local_player->getPosition().y;
+
+		non_local_shield = Shield(shield_position, Shield_stats(e, 10, SHIELD_RADIUS));
+		std::cout << "shield recived: " << element << " " << shield_radius << "\n";
+	}
 
 }
 
@@ -436,7 +464,8 @@ void GameManager::pack_all_and_send()
 	packet_to_send << 1;
 	pack_player(packet_to_send);
 	pack_ball_objects(packet_to_send);
-	//pack_shield_object(packet_to_send);
+	pack_trap_objects(packet_to_send);
+	pack_shield_object(packet_to_send);
 	network_handler->send_packet(packet_to_send);
 }
 
@@ -444,7 +473,8 @@ void GameManager::recive_and_unpack_all()
 {
 	sf::Packet recived_packet = network_handler->recive_packet();
 
-	unpack_player(recived_packet);
+		unpack_player(recived_packet);
 	unpack_ball_objects(recived_packet);
-	//unpack_shield_object(recived_packet);
+	unpack_trap_objects(recived_packet);
+	unpack_shield_object(recived_packet);
 }
