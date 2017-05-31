@@ -17,28 +17,6 @@ void GameManager::change_game_state(Game_states state)
 void GameManager::draw()
 {
 	main_window.clear(sf::Color(50,120,50));
-	/*std::vector<ColidableObject*> objects_to_draw = collision_handler.get_all_objects();
-	for (int i = 0; i < objects_to_draw.size(); i++)
-	{
-		if (Player* player = dynamic_cast<Player*>(objects_to_draw[i]))
-		{
-			main_window.draw(player->getShape());
-		}
-		if (Ball* ball = dynamic_cast<Ball*>(objects_to_draw[i]))
-		{
-			main_window.draw(ball->getShape());
-		}
-		if (Shield* shield = dynamic_cast<Shield*>(objects_to_draw[i]))
-		{
-			main_window.draw(shield->getShape());
-		}
-		if (Trap* trap = dynamic_cast<Trap*>(objects_to_draw[i]))
-		{
-			main_window.draw(trap->getShape()); 
-		}
-
-	}*/
-
 	
 	main_window.draw(local_player->getShape());
 	main_window.draw(non_local_player->getShape());
@@ -200,7 +178,7 @@ void GameManager::loging_menu()
 	std::string username;
 	std::string password;
 
-	std::cout << "Czy chcesz odpaliæ klienta z po³¹czeniem do serwera(tak) lub bez (nie) ";
+	std::cout << "Czy chcesz odpaliÃ¦ klienta z poÂ³Â¹czeniem do serwera(tak) lub bez (nie) ";
 	std::cin >> ip_adress;
 	want_to_run_with_connection_to_server = ip_adress == "tak";
 	if (want_to_run_with_connection_to_server)
@@ -214,12 +192,12 @@ void GameManager::loging_menu()
 
 
 		if (network_handler->connect(ip_adress))
-		{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
+		{// tutaj sprawdzanie czy hasÂ³o zostaÂ³o poprawnie wprowadzone i czy username jest z nim zgodne
 			sf::Packet login_information_to_send;
 			login_information_to_send << 0 << username << password; //0 = LOGIN_PACKET
 
 			network_handler->send_packet(login_information_to_send);
-			std::cout << "wys³ano pakiet\n";
+			std::cout << "wysÂ³ano pakiet\n";
 			sf::Packet recived = network_handler->recive_packet();
 			std::cout << "odebrano pakiet\n";
 			bool logged;
@@ -227,14 +205,14 @@ void GameManager::loging_menu()
 			std::cout << "logged:" << logged << "\n";
 			if (logged)
 			{
-				change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
+				change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu Â³aczenie do gry
 				main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 			}
 		}
 	}
 	else
 	{
-		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
+		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu Â³aczenie do gry
 		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 	}
 }
@@ -250,16 +228,16 @@ void GameManager::connecting_to_game()
 GameManager::GameManager()
 {
 
-	//Do rysowania znaków
+	//Do rysowania znakÃ³w
 	Pattern = Pattern_management(WINDOW_WIDTH, WINDOW_HEIGHT); //new empty array of points connected to form a line
 
 	game_is_running = true;
 	is_pattern_drawn = false;
 	players_initialization();
-	//ustawienie stanu pocz¹tkowego gry(menu logowania)
+	//ustawienie stanu poczÂ¹tkowego gry(menu logowania)
 	current_game_state = LOGING_MENU;
 
-	//inicjalizacja obs³ugi sieci
+	//inicjalizacja obsÂ³ugi sieci
 	network_handler = new NetworkHandler(PORT);
 }
 GameManager::~GameManager()
@@ -338,7 +316,7 @@ void GameManager::players_initialization()
 	non_local_player->setPosition(400, 60);
 
 
-	//dodanie obiektów do collision_handler;
+	//dodanie obiektÃ³w do collision_handler;
 	//collision_handler.add_object(*non_local_player);
 	//collision_handler.add_object(*local_player);
 }
