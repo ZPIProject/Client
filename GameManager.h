@@ -15,6 +15,7 @@
 class GameManager
 {
 	bool is_pattern_drawn;
+	std::string current_username;
 	Pattern_management Pattern;
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
@@ -59,7 +60,7 @@ class GameManager
 	void managePattern();
 	void cast_spell();
 	void loging_menu();
-	void connecting_to_server();
+	void character_selection(std::string username);
 	void main_menu();
 	void connecting_to_game();
 	void game_in_progress();
