@@ -218,14 +218,14 @@ void GameManager::loging_menu()
 	}
 }
 
-void GameManager::character_selection(std::string nick)
+void GameManager::character_selection(std::string username)
 {
-	sf::Packet packet_with_nick;
+	sf::Packet packet_with_username;
 	sf::Packet character_name_list;
 
-	packet_with_nick << 5 /*Character_list packet*/ << nick;
+	packet_with_username << 5 /*Character_list packet*/ << username;
 
-	network_handler->send_packet(packet_with_nick);
+	network_handler->send_packet(packet_with_username);
 	character_name_list = network_handler->recive_packet();
 
 	int characters_count;
@@ -287,7 +287,7 @@ void GameManager::run()
 			loging_menu();
 			break;
 		case CONNECTING_TO_SERVER:
-			connecting_to_server();
+			character_selection(current_username);
 			break;
 		case MAIN_MENU:
 			main_menu();
