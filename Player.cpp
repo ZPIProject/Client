@@ -1,16 +1,16 @@
 #include "Player.h"
-#include "Spell_Headers\Ball.h"
-#include "Spell_Headers\Shield.h"
-#include "Spell_Headers\Trap.h"
+#include "Ball.h"
+#include "Shield.h"
+#include "Trap.h"
 
 
-Player::Player(sf::Color players_color, float player_size, Player_stats stts) : ColidableObject(new CircleCollider(player_size/2)),stats(stts)
+Player::Player(sf::Color players_color, float player_size) : ColidableObject(new CircleCollider(player_size/2))
 {
 	player_shape.setPosition(sf::Vector2f(0, 0));
 	player_shape.setFillColor(players_color);
 	player_shape.setSize(sf::Vector2f(player_size, player_size));
 	player_shape.setOrigin(sf::Vector2f(player_size /2, player_size /2));
-	stats.set_speed(3); // daæ to jako parametr i ewentualnie daæ metode setColor
+	speed = 1.5; // daæ to jako parametr i ewentualnie daæ metode setColor
 
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
@@ -47,6 +47,10 @@ void Player::setRotation(double rot)
 	player_shape.setRotation(rot);
 }
 
+void Player::setStatus(PlayerStatus status)
+{
+	this->status = status;
+}
 void Player::move_to_mouse(int directionX, int directionY)
 {
 	sf::Vector2f playerPosition = player_shape.getPosition();
@@ -55,22 +59,22 @@ void Player::move_to_mouse(int directionX, int directionY)
 	float	cosinus = cos((rotation * M_PI) / 180.0f);
 	//std::cout << sinus << " " << cosinus << std::endl;
 	if (directionX == -1) //A
-		player_shape.move(stats.get_speed()*(cosinus), stats.get_speed()*(sinus));
+		player_shape.move(speed*(cosinus), speed*(sinus));
 	else if(directionX == 1) //D
-		player_shape.move(-stats.get_speed()*(cosinus), -stats.get_speed()*sinus);
+		player_shape.move(-speed*(cosinus), -speed*sinus);
 	if (directionY == 1) //S
-		player_shape.move(stats.get_speed()*(-sinus), stats.get_speed()*cosinus);
+		player_shape.move(speed*(-sinus), speed*cosinus);
 	else if (directionY == -1)//W
-		player_shape.move(stats.get_speed()*sinus, stats.get_speed()*(-cosinus));
-		//player_shape.setPosition(playerPosition.x + stats.get_speed()*sinus, playerPosition.y + stats.get_speed()*(-cosinus));
-		//dzia³a tak samo jak player_shape.move(stats.get_speed()*sinus, stats.get_speed()*(-cosinus));
+		player_shape.move(speed*sinus, speed*(-cosinus));
+		//player_shape.setPosition(playerPosition.x + speed*sinus, playerPosition.y + speed*(-cosinus));
+		//dzia³a tak samo jak player_shape.move(speed*sinus, speed*(-cosinus));
 
 	
 }
 
 void Player::move(int directionX, int directionY)
 {
-	player_shape.move(stats.get_speed()*(directionX), stats.get_speed()*(directionY));
+	player_shape.move(speed*(directionX), speed*(directionY));
 
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
@@ -112,6 +116,11 @@ sf::RectangleShape Player::getShape()
 	return player_shape;
 }
 
+double Player::getSpeed()
+{
+	return speed;
+}
+
 void Player::onCollision(ColidableObject* object)
 {
 
@@ -124,6 +133,9 @@ void Player::onCollision(ColidableObject* object)
 	else if (Trap* trap = dynamic_cast<Trap*>(object))
 	{
 		std::cout << "Trap hitted player\n";
-		//obs³uga kolizji z trap'em
+		int element = (int)trap->getStatistics().get_element();
+		setStatus((PlayerStatus)element);
+		std::cout << "Status: " << (int)status << "\n";
+		
 	}
 }
