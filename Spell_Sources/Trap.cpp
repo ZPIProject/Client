@@ -1,5 +1,6 @@
 #include "..\Spell_Headers\Trap.h"
 #include "..\Collider_Headers\CircleCollider.h"
+#include "..\Player.h"
 
 Trap::Trap(sf::Vector2i position, Trap_stats stats) : ColidableObject(new CircleCollider(stats.get_radius())){
 	statistics = stats;
@@ -38,7 +39,17 @@ bool Trap::has_ended()
 
 void Trap::onCollision(ColidableObject * object)
 {
-	is_active = false;
+	if (Player* player = dynamic_cast<Player*>(object))
+	{
+		std::cout << "Hitted trap set active fasle";
+		is_active = false;
+	}
+		
+}
+
+Trap_stats Trap::getTrapStats()
+{
+	return statistics;
 }
 
 sf::CircleShape Trap::getShape()

@@ -8,7 +8,7 @@ Player::Player(sf::Color players_color, float player_size, Player_stats stts) : 
 {
 	player_shape.setPosition(sf::Vector2f(0, 0));
 	player_shape.setFillColor(players_color);
-	player_shape.setSize(sf::Vector2f(player_size, player_size));
+	player_shape.setRadius(player_size/2);
 	player_shape.setOrigin(sf::Vector2f(player_size /2, player_size /2));
 	stats.set_speed(3); // daæ to jako parametr i ewentualnie daæ metode setColor
 
@@ -17,8 +17,6 @@ Player::Player(sf::Color players_color, float player_size, Player_stats stts) : 
 		circle->setPosition(player_shape.getPosition());
 		//std::cout << "Player_constructor: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
 	}
-	
-
 }
 
 
@@ -107,7 +105,7 @@ sf::Vector2f Player::getPosition()
 	return player_shape.getPosition();
 }
 
-sf::RectangleShape Player::getShape()
+sf::CircleShape Player::getShape()
 {
 	return player_shape;
 }
@@ -123,7 +121,33 @@ void Player::onCollision(ColidableObject* object)
 	}
 	else if (Trap* trap = dynamic_cast<Trap*>(object))
 	{
-		std::cout << "Trap hitted player\n";
+		//std::cout << "Trap hitted player\n";
+		int element = (int)trap->getTrapStats().get_element();
+		switch (element)
+		{
+		case 1:
+			current_status.push_back("Debuff");
+			break;
+		case 4:
+			current_status.push_back("Stun");
+			break;
+		case 5:
+			current_status.push_back("Damage");
+			break;
+		case 6:
+			current_status.push_back("Confusion");
+			break;
+		case 9:
+			current_status.push_back("Slow");
+			break;
+		default:
+			break;
+		}
 		//obs³uga kolizji z trap'em
 	}
+}
+
+std::vector<std::string> Player::getCurrent_status()
+{
+	return current_status;
 }

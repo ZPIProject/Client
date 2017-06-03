@@ -1,14 +1,14 @@
 #pragma once
 enum class Element
 {
-	PLACEHOLDER0,
-	WIND,
-	PLACEHOLDER1,
-	PLACEHOLDER2,
-	EARTH,
-	FIRE,
-	THUNDER,
-	PLACEHOLDER3,
-	PLACEHOLDER4,
-	WATER
+	PLACEHOLDER0,	//0-
+	WIND,			//1-wind
+	PLACEHOLDER1,	//2-aura
+	PLACEHOLDER2,	//3-shield
+	EARTH,			//4-earth
+	FIRE,			//5-fire
+	THUNDER,		//6-thunder
+	PLACEHOLDER3,	//7-projectile
+	PLACEHOLDER4,	//8-trap
+	WATER			//9-water
 };

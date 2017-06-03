@@ -17,10 +17,45 @@ void GameManager::change_game_state(Game_states state)
 void GameManager::draw()
 {
 	main_window.clear(sf::Color(50,120,50));
+
+	main_window.draw(separator->getShape());
 	
 	main_window.draw(local_player->getShape());
 	main_window.draw(non_local_player->getShape());
 
+	if (current_spell_hud->getElement() > 0 && current_spell_hud->getSpell() > 0) {
+		current_spell_hud->setPosition(sf::Vector2f(sf::Mouse::getPosition(main_window).x + 10, sf::Mouse::getPosition(main_window).y + 10));
+		main_window.draw(current_spell_hud->getText());
+	}
+
+	if (local_status_hud->getElement() == 0) {
+		std::vector<std::string> status_local = local_player->getCurrent_status();
+		std::string result;
+		for (std::string s : status_local) {
+			result += s + "\n";
+		}
+		local_status_hud->setPosition(sf::Vector2f(local_player->getPosition().x - PLAYER_SIZE/2, local_player->getPosition().y - 5 - status_local.size()*13));
+		local_status_hud->setText(result);
+		main_window.draw(local_status_hud->getText());
+	}
+
+	if (non_local_status_hud->getElement() == 0) {
+		std::vector<std::string> status_non_local = non_local_player->getCurrent_status();
+		std::string result;
+		for (std::string s : status_non_local) {
+			result += s + "\n";
+		}
+		non_local_status_hud->setPosition(sf::Vector2f(non_local_player->getPosition().x - PLAYER_SIZE/2, non_local_player->getPosition().y - 5 - status_non_local.size() * 13));
+		non_local_status_hud->setText(result);
+		main_window.draw(local_status_hud->getText());
+	}
+
+	std::vector<sf::Text> texts = hud->getTexts();
+
+	for (sf::Text t : texts) {
+		main_window.draw(t);
+	}
+	
 	for (int i = 0; i < balls_vector.size(); i++)
 	{
 		main_window.draw(balls_vector[i].getShape());
@@ -60,6 +95,9 @@ void GameManager::event_handler()
 
 void GameManager::logic_handler()
 {
+	current_spell_hud->setElement(active_element);
+	current_spell_hud->setSpell(active_spell);
+
 	sf::Mouse mouse;
 	int directionX = 0, directionY = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -71,20 +109,26 @@ void GameManager::logic_handler()
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		directionY = 1;
 
-	
-
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 		cast_spell();
 	}
 
 	local_player->rotate(main_window.mapPixelToCoords(sf::Mouse::getPosition(main_window)));
-	local_player->move(directionX, directionY);
+	if (local_player->getPosition().x + directionX >= PLAYER_SIZE / 2 &&
+		local_player->getPosition().x + directionX <= WINDOW_WIDTH - PLAYER_SIZE / 2 &&
+		local_player->getPosition().y + directionY <= WINDOW_HEIGHT - PLAYER_SIZE / 2 - 1 &&
+		local_player->getPosition().y + directionY >= WINDOW_HEIGHT / 2 + SEPARATOR_HEIGHT / 2 + PLAYER_SIZE / 2 + 2)
+		local_player->move(directionX, directionY);
+	
+	//std::cout << local_player->getPosition().x << std::endl;
+	//std::cout << local_player->getPosition().y << std::endl;
+
 	local_shield.move(local_player->getPosition());
 	managePattern();
 
 
 	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
-	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
+	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended() || !t.getActiveStatus(); }), trap_vector.end());
 
 	collision_handler.clear();
 	for (int i = 0; i < balls_vector.size(); i++)
@@ -93,7 +137,7 @@ void GameManager::logic_handler()
 		collision_handler.add_object(trap_vector[i]);
 	
 	collision_handler.add_object(*non_local_player);
-	collision_handler.add_object(*non_local_player);
+	collision_handler.add_object(*local_player);
 	
 	if(!local_shield.has_ended())
 		collision_handler.add_object(local_shield);
@@ -113,9 +157,8 @@ void GameManager::managePattern()
 		if(P_Double>0)std::cout << P_Double<<std::endl;
 		setActiveSpellData(P_Double);
 	}
-
-
 }
+
 void GameManager::cast_spell()
 {
 	if(active_spell>0 && active_element>0){
@@ -143,6 +186,7 @@ void GameManager::cast_spell()
 			float duration = 10.0f;
 
 			Trap trap = Trap(sf::Mouse::getPosition(main_window), Trap_stats(e, duration, radius));
+			//std::cout << trap.getActiveStatus() << std::endl;
 			trap_vector.push_back(trap);
 			traps_to_send.push_back(trap);
 
@@ -216,9 +260,6 @@ void GameManager::loging_menu()
 		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 	}
 }
-void GameManager::connecting_to_server()
-{
-}
 void GameManager::main_menu()
 {
 }
@@ -234,6 +275,7 @@ GameManager::GameManager()
 	game_is_running = true;
 	is_pattern_drawn = false;
 	players_initialization();
+	separator = new Separator();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
 	current_game_state = LOGING_MENU;
 
@@ -256,7 +298,7 @@ void GameManager::run()
 			loging_menu();
 			break;
 		case CONNECTING_TO_SERVER:
-			connecting_to_server();
+			//connecting_to_server();
 			break;
 		case MAIN_MENU:
 			main_menu();
@@ -307,12 +349,19 @@ void GameManager::disconnect()
 void GameManager::players_initialization()
 {
 	Player_stats stats(3, 3, 3, 3, 3, 3, 3,3,3,"Valium");
+	Player_stats stats1(3, 3, 3, 3, 3, 3, 3, 3, 3, "Valium");
 	local_player = new Player(sf::Color::Red, PLAYER_SIZE,stats);
-	int local_player_position_x = (WINDOW_WIDTH - local_player->getShape().getSize().x) / 2;
-	int local_player_position_y = (WINDOW_HEIGHT - local_player->getShape().getSize().y);
+	hud = new Player_Hud(stats, stats1);
+	local_status_hud = new Status_Hud();
+	non_local_status_hud = new Status_Hud();
+	current_spell_hud = new Current_Spell_Hud();
+	int local_player_position_x = (WINDOW_WIDTH/2);
+	int local_player_position_y = (WINDOW_HEIGHT - 2*local_player->getShape().getRadius());
+	//int local_player_position_x = (WINDOW_WIDTH - local_player->getShape().getRadius()) / 2;
+	//int local_player_position_y = (WINDOW_HEIGHT - local_player->getShape().getRadius());
 	local_player->setPosition(local_player_position_x, local_player_position_y);
 
-	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE,stats);
+	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE,stats1);
 	non_local_player->setPosition(400, 60);
 
 
@@ -334,8 +383,8 @@ void GameManager::unpack_player(sf::Packet& recived_packet)
 	recived_packet >> packet_type >> recived_position_x >> recived_position_y >> recived_rotation;
 	//std::cout << recived_position_x << " " << recived_position_y << " " << recived_rotation;
 	sf::Vector2f playerPosition;
-	playerPosition.x = WINDOW_WIDTH - non_local_player->getShape().getSize().x / 2 - recived_position_x;
-	playerPosition.y = WINDOW_HEIGHT - non_local_player->getShape().getSize().y / 2 - recived_position_y;
+	playerPosition.x = WINDOW_WIDTH - non_local_player->getShape().getRadius() / 2 - recived_position_x;
+	playerPosition.y = WINDOW_HEIGHT - non_local_player->getShape().getRadius() / 2 - recived_position_y;
 	non_local_player->setPosition(playerPosition);
 	non_local_player->setRotation(recived_rotation);
 

@@ -20,12 +20,17 @@ public:
 	void rotate(sf::Vector2f mousePosition);
 
 	sf::Vector2f getPosition();
-	sf::RectangleShape getShape();
+	sf::CircleShape getShape();
 	
 	void onCollision(ColidableObject* object);
 
+	Player_stats getStats();
+
+	std::vector<std::string> getCurrent_status();
+
 private:
-	sf::RectangleShape player_shape;
+	sf::CircleShape player_shape;
 	Player_stats stats;
+	std::vector<std::string> current_status;
 };
 

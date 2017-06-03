@@ -1,6 +1,10 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 
+#include "Separator.h"
+#include "Player_Hud.h"
+#include "Status_Hud.h"
+#include "Current_Spell_Hud.h"
 
 #include "Player.h"
 #include "Spell_Headers\Trap.h"
@@ -23,6 +27,13 @@ class GameManager
 
 	sf::RenderWindow main_window;
 	sf::Clock frame_rate_controller;
+	
+	Player_Hud* hud;
+	Current_Spell_Hud* current_spell_hud;
+	Status_Hud* local_status_hud;
+	Status_Hud* non_local_status_hud;
+	
+	Separator* separator;
 	
 	Player* local_player;
 	Player* non_local_player;

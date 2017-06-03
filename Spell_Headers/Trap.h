@@ -17,10 +17,11 @@ public:
 
 	void setRadius(float f) { trap_shape.setRadius(f); }
 	void onCollision(ColidableObject* object);
+	Trap_stats getTrapStats();
 private:
 	Trap_stats statistics;
 	sf::CircleShape trap_shape;
-
+	
 	sf::Color set_fill_color(Element e);
 };
 
