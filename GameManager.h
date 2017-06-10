@@ -21,7 +21,7 @@ class GameManager
 
 	bool want_to_run_with_connection_to_server;
 
-	sf::RenderWindow main_window;
+	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
 	
 	Player* local_player;
@@ -60,7 +60,7 @@ class GameManager
 	void managePattern();
 	void cast_spell();
 	void loging_menu();
-	void character_selection(std::string username);
+	void character_selection(std::string username) {};
 	void main_menu();
 	void connecting_to_game();
 	void game_in_progress();
@@ -86,7 +86,7 @@ class GameManager
 	void pack_all_and_send();
 	void recive_and_unpack_all();
 public:
-	GameManager();
+	GameManager(NetworkHandler* network, sf::RenderWindow& window);
 	~GameManager();
 
 	void run();

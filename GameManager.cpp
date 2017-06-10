@@ -16,38 +16,38 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window.clear(sf::Color(50,120,50));
+	main_window->clear(sf::Color(50,120,50));
 	
-	main_window.draw(local_player->getShape());
-	main_window.draw(non_local_player->getShape());
+	main_window->draw(local_player->getShape());
+	main_window->draw(non_local_player->getShape());
 
 	for (int i = 0; i < balls_vector.size(); i++)
 	{
-		main_window.draw(balls_vector[i].getShape());
+		main_window->draw(balls_vector[i].getShape());
 		balls_vector[i].move();
 	}
 
 	for (int i = 0; i < trap_vector.size(); i++)
 	{
-		main_window.draw(trap_vector[i].getShape());
+		main_window->draw(trap_vector[i].getShape());
 	}
 
 	if(!local_shield.has_ended())
-		main_window.draw(local_shield.getShape());
+		main_window->draw(local_shield.getShape());
 	if(!non_local_shield.has_ended())
-		main_window.draw(non_local_shield.getShape());
+		main_window->draw(non_local_shield.getShape());
 
-	main_window.draw(Pattern.getArray());
-	main_window.display();
+	main_window->draw(Pattern.getArray());
+	main_window->display();
 }
 
 void GameManager::event_handler()
 {
 	sf::Event event;
-	while (main_window.pollEvent(event))
+	while (main_window->pollEvent(event))
 	{
 		if (event.type == sf::Event::Closed)
-			main_window.close();
+			main_window->close();
 		else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right){	
 			is_pattern_drawn = true;		
 		}
@@ -77,7 +77,7 @@ void GameManager::logic_handler()
 		cast_spell();
 	}
 
-	local_player->rotate(main_window.mapPixelToCoords(sf::Mouse::getPosition(main_window)));
+	local_player->rotate(main_window->mapPixelToCoords(sf::Mouse::getPosition(*main_window)));
 	local_player->move(directionX, directionY);
 	local_shield.move(local_player->getPosition());
 	managePattern();
@@ -108,8 +108,8 @@ void GameManager::logic_handler()
 
 void GameManager::managePattern()
 {
-	if (sf::Mouse::getPosition(main_window).x >= 0 && sf::Mouse::getPosition(main_window).y >= 0 && sf::Mouse::getPosition(main_window).x < main_window.getSize().x, sf::Mouse::getPosition(main_window).y < main_window.getSize().y) {
-		double P_Double= Pattern.manage_pattern(sf::Mouse::getPosition(main_window).x, sf::Mouse::getPosition(main_window).y, is_pattern_drawn);
+	if (sf::Mouse::getPosition(*main_window).x >= 0 && sf::Mouse::getPosition(*main_window).y >= 0 && sf::Mouse::getPosition(*main_window).x < main_window->getSize().x, sf::Mouse::getPosition(*main_window).y < main_window->getSize().y) {
+		double P_Double= Pattern.manage_pattern(sf::Mouse::getPosition(*main_window).x, sf::Mouse::getPosition(*main_window).y, is_pattern_drawn);
 		if(P_Double>0)std::cout << P_Double<<std::endl;
 		setActiveSpellData(P_Double);
 	}
@@ -142,7 +142,7 @@ void GameManager::cast_spell()
 			float radius = 5;
 			float duration = 10.0f;
 
-			Trap trap = Trap(sf::Mouse::getPosition(main_window), Trap_stats(e, duration, radius));
+			Trap trap = Trap(sf::Mouse::getPosition(*main_window), Trap_stats(e, duration, radius));
 			trap_vector.push_back(trap);
 			traps_to_send.push_back(trap);
 
@@ -206,28 +206,27 @@ void GameManager::loging_menu()
 			if (logged)
 			{
 				change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
-				main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
+				
 			}
 		}
 	}
 	else
 	{
 		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
-		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
+		
 	}
 }
-void GameManager::connecting_to_server()
-{
-}
+
 void GameManager::main_menu()
 {
 }
 void GameManager::connecting_to_game()
 {
 }
-GameManager::GameManager()
-{
 
+GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
+{
+	this->main_window = &window;
 	//Do rysowania znaków
 	Pattern = Pattern_management(WINDOW_WIDTH, WINDOW_HEIGHT); //new empty array of points connected to form a line
 
@@ -235,10 +234,10 @@ GameManager::GameManager()
 	is_pattern_drawn = false;
 	players_initialization();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
-	current_game_state = LOGING_MENU;
-
+	current_game_state = GAME_IN_PROGRES;
+	want_to_run_with_connection_to_server = false;
 	//inicjalizacja obs³ugi sieci
-	network_handler = new NetworkHandler(PORT);
+	network_handler = network;
 }
 GameManager::~GameManager()
 {
@@ -250,33 +249,8 @@ void GameManager::run()
 {
 	while (game_is_running)
 	{
-		switch (current_game_state)
-		{
-		case LOGING_MENU:
-			loging_menu();
-			break;
-		case CONNECTING_TO_SERVER:
-			connecting_to_server();
-			break;
-		case MAIN_MENU:
-			main_menu();
-			break;
-		case  CONNECTING_TO_GAME:
-			connecting_to_game();
-			break;
-		case GAME_IN_PROGRES:
-			game_in_progress();
-			break;
-		case  EXITING_GAME:
-			exiting_game();
-			break;
-		case DISCONNECT:
-			disconnect();
-				break;
-
-
-
-		}
+		
+		game_in_progress();
 	}
 }
 void GameManager::game_in_progress()
