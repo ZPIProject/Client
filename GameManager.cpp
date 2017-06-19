@@ -216,9 +216,7 @@ void GameManager::loging_menu()
 		main_window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SignCaster", sf::Style::Close);
 	}
 }
-void GameManager::connecting_to_server()
-{
-}
+
 void GameManager::main_menu()
 {
 }
@@ -256,7 +254,7 @@ void GameManager::run()
 			loging_menu();
 			break;
 		case CONNECTING_TO_SERVER:
-			connecting_to_server();
+			//character_selection(current_username);
 			break;
 		case MAIN_MENU:
 			main_menu();
@@ -264,7 +262,7 @@ void GameManager::run()
 		case  CONNECTING_TO_GAME:
 			connecting_to_game();
 			break;
-		case GAME_IN_PROGRES:
+		case GAME_IN_PROGRES:	
 			game_in_progress();
 			break;
 		case  EXITING_GAME:
