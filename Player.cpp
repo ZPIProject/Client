@@ -127,3 +127,16 @@ void Player::onCollision(ColidableObject* object)
 		//obs³uga kolizji z trap'em
 	}
 }
+
+
+
+void Player::decMana(float val)
+{
+	stats.set_current_mana(stats.get_current_mana() - val);
+}
+
+void Player::incMana()
+{
+	stats.set_current_mana(stats.get_current_mana() + 0.2);
+	if (stats.get_current_mana() > stats.get_MAX_mana())stats.set_current_mana(stats.get_MAX_mana());
+}

@@ -60,6 +60,8 @@ void GameManager::event_handler()
 
 void GameManager::logic_handler()
 {
+	local_player->incMana();
+	std::cout << local_player->getMana() << std::endl;
 	sf::Mouse mouse;
 	int directionX = 0, directionY = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -70,6 +72,7 @@ void GameManager::logic_handler()
 		directionY = -1;
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		directionY = 1;
+	
 
 	
 
@@ -121,40 +124,51 @@ void GameManager::cast_spell()
 	if(active_spell>0 && active_element>0){
 		if (active_spell == 7 && ball_cooldown.getElapsedTime().asMilliseconds() > 500)
 		{
-			//Ball_stats configuration
-			float damage = 10;
-			float speed = PROJECTILE_STANDARD_SPEED;
-			float radius = 10;
-			Element e = (Element)active_element;
+				if (local_player->getMana() >= 60) {
+				local_player->decMana(60);
+				//Ball_stats configuration
+				float damage = 10;
+				float speed = PROJECTILE_STANDARD_SPEED;
+				float radius = 10;
+				Element e = (Element)active_element;
 
-			sf::Vector2f fixed_ball_position = sf::Vector2f(local_player->getPosition().x, local_player->getPosition().y - 50);
-			Ball ball = Ball(fixed_ball_position, Ball_stats(e, damage, speed, radius));
-			ball.on_cast_set_direction(local_player->getShape().getRotation());
-			balls_vector.push_back(ball);
-			balls_to_send.push_back(ball);
+				sf::Vector2f fixed_ball_position = sf::Vector2f(local_player->getPosition().x, local_player->getPosition().y - 50);
+				Ball ball = Ball(fixed_ball_position, Ball_stats(e, damage, speed, radius));
+				ball.on_cast_set_direction(local_player->getShape().getRotation());
+				balls_vector.push_back(ball);
+				balls_to_send.push_back(ball);
 
-			ball_cooldown.restart();
+				ball_cooldown.restart();
+		}
 		}
 		if (active_spell == 8 && trap_cooldown.getElapsedTime().asMilliseconds() > 500)
 		{
-			//Trap_stats configuration
-			Element e = (Element)active_element;
-			float radius = 5;
-			float duration = 10.0f;
+			if (local_player->getMana() >= 40) {
+				local_player->decMana(40);
 
-			Trap trap = Trap(sf::Mouse::getPosition(*main_window), Trap_stats(e, duration, radius));
-			trap_vector.push_back(trap);
-			traps_to_send.push_back(trap);
+				//Trap_stats configuration
+				Element e = (Element)active_element;
+				float radius = 5;
+				float duration = 10.0f;
 
-			trap_cooldown.restart();
+				Trap trap = Trap(sf::Mouse::getPosition(*main_window), Trap_stats(e, duration, radius));
+				trap_vector.push_back(trap);
+				traps_to_send.push_back(trap);
+
+				trap_cooldown.restart();
+			}
 		}
 		if (active_spell == 3 && !local_shield.has_ended())
 		{
-			Element e = (Element)active_element;
-			float radius = SHIELD_RADIUS;
-			float duration = 30.0f;
+			if (local_player->getMana() >= 20) {
+				local_player->decMana(20);
 
-			local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
+				Element e = (Element)active_element;
+				float radius = SHIELD_RADIUS;
+				float duration = 30.0f;
+
+				local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
+			}
 		}
 		active_spell = active_element = 0;
 	}
@@ -280,7 +294,7 @@ void GameManager::disconnect()
 
 void GameManager::players_initialization()
 {
-	Player_stats stats(3, 3, 3, 3, 3, 3, 3,3,3,"Valium");
+	Player_stats stats(100, 100,100,100,100,100,100,100,100,"Valium");
 	local_player = new Player(sf::Color::Red, PLAYER_SIZE,stats);
 	int local_player_position_x = (WINDOW_WIDTH - local_player->getShape().getSize().x) / 2;
 	int local_player_position_y = (WINDOW_HEIGHT - local_player->getShape().getSize().y);

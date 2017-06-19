@@ -23,6 +23,10 @@ public:
 	sf::RectangleShape getShape();
 	
 	void onCollision(ColidableObject* object);
+	void decMana(float val);
+	void incMana();
+	float getMana() { return stats.get_current_mana(); }
+
 
 private:
 	sf::RectangleShape player_shape;
