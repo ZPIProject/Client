@@ -11,6 +11,8 @@ public:
 	float get_speed() { return speed; }
 	float get_radius() { return radius; }
 
+	void set_damage(float dmg) { damage = dmg; }
+
 private:
 	float damage;
 	float speed;

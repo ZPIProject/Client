@@ -4,6 +4,7 @@
 #include "NetworkHandler.h"
 #include <iostream>
 #include "GameManager.h"
+#include "Tree.h"
 class GuiHandler
 {
 public:
@@ -52,9 +53,7 @@ private:
 
 	bool did_active_gui_changed;
 
-
-	
-
+	void buySkill(int idS, std::string character, Tree* tree);
 
 	void on_character_select_button();
 	

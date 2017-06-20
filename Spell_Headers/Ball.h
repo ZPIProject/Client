@@ -32,7 +32,7 @@ public:
 	float get_speed() { return statistics.get_speed(); }
 	int get_owner() { return owner; }
 
-	
+	Ball_stats getStatistics();
 
 
 	

@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 
-
 #include "Player.h"
 #include "Spell_Headers\Trap.h"
 #include "Spell_Headers\Ball.h"
@@ -11,6 +10,11 @@
 #include "NetworkHandler.h"
 #include "Pattern_management.h"
 #include "Collider_Headers\CollisionHandler.h"
+
+#include "Separator.h"
+#include "Player_Hud.h"
+#include "Status_Hud.h"
+#include "Current_Spell_Hud.h"
 
 class GameManager
 {
@@ -24,6 +28,16 @@ class GameManager
 	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
 	
+	Separator* separator;
+
+	Player_Hud* hud;
+	Current_Spell_Hud* current_spell_hud;
+	Status_Hud* local_status_hud;
+	Status_Hud* non_local_status_hud;
+	
+	Player_stats* stats;
+	Player_stats* stats1;
+
 	Player* local_player;
 	Player* non_local_player;
 
@@ -49,6 +63,8 @@ class GameManager
 
 	int active_spell = 0; 
 	int active_element = 0;
+	float draw_precision_spell = 0;
+	float draw_precision_element = 0;
 
 	bool game_is_running;
 
