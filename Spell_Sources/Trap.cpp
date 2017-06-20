@@ -70,3 +70,8 @@ sf::Color Trap::set_fill_color(Element e)
 	}
 	return color;
 }
+
+Trap_stats Trap::getTrapStats()
+{
+	return statistics;
+}
