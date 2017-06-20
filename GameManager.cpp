@@ -4,10 +4,10 @@
 #include "Spell_Headers\Ball.h"
 #include "Collider_Headers\ColidableObject.h"
 #include <iomanip>
-
 #include <thread>
-
-
+#include <cmath>
+#include <cstdio>
+#include <limits>
 
 void GameManager::change_game_state(Game_states state)
 {
@@ -18,8 +18,52 @@ void GameManager::draw()
 {
 	main_window->clear(sf::Color(50,120,50));
 	
+	main_window->draw(separator->getShape());
+
 	main_window->draw(local_player->getShape());
 	main_window->draw(non_local_player->getShape());
+
+	if (current_spell_hud->getElement() > 0 && current_spell_hud->getSpell() > 0) {
+		current_spell_hud->setPosition(sf::Vector2f(sf::Mouse::getPosition(*main_window).x + 10, sf::Mouse::getPosition(*main_window).y + 10));
+		main_window->draw(current_spell_hud->getText());
+	}
+
+	if (local_player->getCurrent_status().size() != 0) {
+		std::vector<StatusStringHud> status_local = local_player->getCurrent_status();
+		std::string result;
+		std::vector<std::string> vector;
+		for (StatusStringHud s : status_local) {
+			if (!s.has_ended()) vector.push_back(s.getName());
+		}
+		for (std::string s : vector) {
+			result += s + "\n";
+		}
+		local_status_hud->setPosition(sf::Vector2f(local_player->getPosition().x - PLAYER_SIZE / 2, local_player->getPosition().y - 5 - status_local.size() * 13));
+		local_status_hud->setText(result);
+		main_window->draw(local_status_hud->getText());
+	}
+
+	if (non_local_player->getCurrent_status().size() != 0) {
+		std::vector<StatusStringHud> status_non_local = non_local_player->getCurrent_status();
+		std::string result;
+		std::vector<std::string> vector;
+		for (StatusStringHud s : status_non_local) {
+			if (!s.has_ended()) vector.push_back(s.getName());
+		}
+		for (std::string s : vector) {
+			result += s + "\n";
+		}
+		non_local_status_hud->setPosition(sf::Vector2f(non_local_player->getPosition().x - PLAYER_SIZE / 2, non_local_player->getPosition().y - 5 - status_non_local.size() * 13));
+		non_local_status_hud->setText(result);
+
+		main_window->draw(non_local_status_hud->getText());
+	}
+
+	std::vector<sf::Text> texts = hud->getTexts();
+
+	for (sf::Text t : texts) {
+		main_window->draw(t);
+	}
 
 	for (int i = 0; i < balls_vector.size(); i++)
 	{
@@ -53,15 +97,39 @@ void GameManager::event_handler()
 		}
 		else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
 			is_pattern_drawn = false;
-
 		}
 	}
 }
 
 void GameManager::logic_handler()
 {
+	hud->setLocalMpText(hud->Convert(stats->get_current_mana()) + "/" + hud->Convert(stats->get_MAX_mana()) + ":MP");
+	hud->setLocalHpText(hud->Convert(stats->get_current_health()) + "/" + hud->Convert(stats->get_MAX_health()) + ":HP");
+	hud->setOpponentHpText("HP:" + hud->Convert((stats1->get_current_health() / stats1->get_MAX_health()) * 100) + "%");
+
 	local_player->incMana();
-	std::cout << local_player->getMana() << std::endl;
+	
+	std::vector<StatusStringHud> status_local = local_player->getCurrent_status();
+	std::vector<int> vector;
+	for (StatusStringHud s : status_local) {
+		if (!s.has_ended()) {
+			int id = s.getId();
+			if (id==1) vector.push_back(1);		//Debuff
+			else if (id == 4) { vector.push_back(2); s.setDuration(1); }//Stun
+			else if (id==5) vector.push_back(3);//Damage
+			else if (id==6) vector.push_back(4);//Confusion
+			else if (id==9) vector.push_back(5);//Slow
+		}
+	}
+
+	if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(1.5);
+	float base_dmg = local_player->getPlayerStats()->get_base_dmg();
+	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg*0.75);
+	if (std::find(vector.begin(), vector.end(), 3) != vector.end()) local_player->getPlayerStats()->set_current_health(local_player->getPlayerStats()->get_current_health() - 0.01);
+
+	current_spell_hud->setElement(active_element);
+	current_spell_hud->setSpell(active_spell);
+
 	sf::Mouse mouse;
 	int directionX = 0, directionY = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -72,19 +140,26 @@ void GameManager::logic_handler()
 		directionY = -1;
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		directionY = 1;
-	
-
-	
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 		cast_spell();
 	}
 
 	local_player->rotate(main_window->mapPixelToCoords(sf::Mouse::getPosition(*main_window)));
-	local_player->move(directionX, directionY);
+
+	if (std::find(vector.begin(), vector.end(), 4) != vector.end()) {
+		directionX = -1 * directionX;
+		directionY = -1 * directionY;
+	}
+	
+	if (local_player->getPosition().x + directionX >= PLAYER_SIZE / 2 &&
+		local_player->getPosition().x + directionX <= WINDOW_WIDTH - PLAYER_SIZE / 2 &&
+		local_player->getPosition().y + directionY <= WINDOW_HEIGHT - PLAYER_SIZE / 2 - 1 &&
+		local_player->getPosition().y + directionY >= WINDOW_HEIGHT / 2 + SEPARATOR_HEIGHT / 2 + PLAYER_SIZE / 2 + 2)
+		if (std::find(vector.begin(), vector.end(), 2) != vector.end());
+		else local_player->move(directionX, directionY);
 	local_shield.move(local_player->getPosition());
 	managePattern();
-
 
 	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
 	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
@@ -96,7 +171,7 @@ void GameManager::logic_handler()
 		collision_handler.add_object(trap_vector[i]);
 	
 	collision_handler.add_object(*non_local_player);
-	collision_handler.add_object(*non_local_player);
+	//collision_handler.add_object(*local_player);
 	
 	if(!local_shield.has_ended())
 		collision_handler.add_object(local_shield);
@@ -104,9 +179,10 @@ void GameManager::logic_handler()
 	if (!non_local_shield.has_ended())
 		collision_handler.add_object(non_local_shield);
 
-
-
 	collision_handler.check_objects_which_colide();
+
+	if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(3);
+	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);
 }
 
 void GameManager::managePattern()
@@ -116,18 +192,22 @@ void GameManager::managePattern()
 		if(P_Double>0)std::cout << P_Double<<std::endl;
 		setActiveSpellData(P_Double);
 	}
-
-
 }
+
 void GameManager::cast_spell()
 {
 	if(active_spell>0 && active_element>0){
 		if (active_spell == 7 && ball_cooldown.getElapsedTime().asMilliseconds() > 500)
 		{
-				if (local_player->getMana() >= 60) {
+			if (local_player->getMana() >= 60) 
+			{
 				local_player->decMana(60);
 				//Ball_stats configuration
-				float damage = 10;
+				float damage = local_player->getPlayerStats()->get_base_dmg();
+				if (draw_precision_spell > 0.95 && draw_precision_element > 0.95) damage *= 1.5;
+				else if (draw_precision_spell > 0.9 || draw_precision_element > 0.9) damage *= 1.2;
+				else if (draw_precision_spell < 0.7 && draw_precision_element > 0.7) damage *= 0.8;
+				
 				float speed = PROJECTILE_STANDARD_SPEED;
 				float radius = 10;
 				Element e = (Element)active_element;
@@ -139,17 +219,22 @@ void GameManager::cast_spell()
 				balls_to_send.push_back(ball);
 
 				ball_cooldown.restart();
-		}
+			}
 		}
 		if (active_spell == 8 && trap_cooldown.getElapsedTime().asMilliseconds() > 500)
 		{
-			if (local_player->getMana() >= 40) {
+			if (local_player->getMana() >= 40) 
+			{
 				local_player->decMana(40);
 
 				//Trap_stats configuration
 				Element e = (Element)active_element;
 				float radius = 5;
 				float duration = 10.0f;
+
+				if (draw_precision_spell > 0.95 && draw_precision_element > 0.95) { radius *= 1.5; duration *= 1.2; }
+				else if (draw_precision_spell > 0.9 || draw_precision_element > 0.9) radius *= 1.2;
+				else if (draw_precision_spell < 0.7 && draw_precision_element > 0.7) duration *= 0.8;
 
 				Trap trap = Trap(sf::Mouse::getPosition(*main_window), Trap_stats(e, duration, radius));
 				trap_vector.push_back(trap);
@@ -160,27 +245,37 @@ void GameManager::cast_spell()
 		}
 		if (active_spell == 3 && !local_shield.has_ended())
 		{
-			if (local_player->getMana() >= 20) {
+			if (local_player->getMana() >= 20) 
+			{
 				local_player->decMana(20);
 
 				Element e = (Element)active_element;
 				float radius = SHIELD_RADIUS;
 				float duration = 30.0f;
+				if (draw_precision_spell > 0.95 && draw_precision_element > 0.95) duration *= 1.5;
+				else if (draw_precision_spell > 0.90 && draw_precision_element > 0.90) duration *= 1.2;
+				else if (draw_precision_spell < 0.70 && draw_precision_element > 0.70) duration *= 0.8;
 
 				local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
-			}
+			}	
 		}
 		active_spell = active_element = 0;
+		draw_precision_spell = draw_precision_element = 0;
 	}
 
 }
 void GameManager::setActiveSpellData(double value)
 {
 	if (value > 0) {
-		if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8)
+		if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8) {
 			active_spell = (int)value;
-		else
+			draw_precision_spell = fmod(value, 1);
+		}
+		else {
 			active_element = (int)value;
+			draw_precision_element = fmod(value, 1);
+		}
+		std::cout << draw_precision_spell << " " << draw_precision_element << std::endl;
 		std::cout << active_spell << " " << active_element << std::endl;
 	}
 	
@@ -247,6 +342,8 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	game_is_running = true;
 	is_pattern_drawn = false;
 	players_initialization();
+	
+	separator = new Separator();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
 	current_game_state = GAME_IN_PROGRES;
 	want_to_run_with_connection_to_server = false;
@@ -294,14 +391,19 @@ void GameManager::disconnect()
 
 void GameManager::players_initialization()
 {
-	Player_stats stats(100, 100,100,100,100,100,100,100,100,"Valium");
-	local_player = new Player(sf::Color::Red, PLAYER_SIZE,stats);
-	int local_player_position_x = (WINDOW_WIDTH - local_player->getShape().getSize().x) / 2;
-	int local_player_position_y = (WINDOW_HEIGHT - local_player->getShape().getSize().y);
+	stats = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100,"Valium1");
+	stats1 = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium2");
+	local_player = new Player(sf::Color::Red, PLAYER_SIZE, stats);
+	hud = new Player_Hud(stats, stats1);
+	local_status_hud = new Status_Hud();
+	non_local_status_hud = new Status_Hud();
+	current_spell_hud = new Current_Spell_Hud();
+	int local_player_position_x = (WINDOW_WIDTH/2);
+	int local_player_position_y = (WINDOW_HEIGHT - 2*local_player->getShape().getRadius());
 	local_player->setPosition(local_player_position_x, local_player_position_y);
 
-	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE,stats);
-	non_local_player->setPosition(400, 60);
+	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE, stats1);
+	non_local_player->setPosition(400, 160);
 
 
 	//dodanie obiektów do collision_handler;
@@ -322,8 +424,8 @@ void GameManager::unpack_player(sf::Packet& recived_packet)
 	recived_packet >> packet_type >> recived_position_x >> recived_position_y >> recived_rotation;
 	//std::cout << recived_position_x << " " << recived_position_y << " " << recived_rotation;
 	sf::Vector2f playerPosition;
-	playerPosition.x = WINDOW_WIDTH - non_local_player->getShape().getSize().x / 2 - recived_position_x;
-	playerPosition.y = WINDOW_HEIGHT - non_local_player->getShape().getSize().y / 2 - recived_position_y;
+	playerPosition.x = WINDOW_WIDTH - non_local_player->getShape().getRadius() / 2 - recived_position_x;
+	playerPosition.y = WINDOW_HEIGHT - non_local_player->getShape().getRadius() / 2 - recived_position_y;
 	non_local_player->setPosition(playerPosition);
 	non_local_player->setRotation(recived_rotation);
 

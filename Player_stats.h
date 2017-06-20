@@ -65,10 +65,6 @@ public:
 		return name;
 	}
 
-
-
-
-
 	void set_current_health(float new_value) {
 		 current_health=new_value;
 	}
