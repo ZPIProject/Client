@@ -41,6 +41,8 @@ public:
 	NetworkHandler* get_network_handler() { return network_handler; }
 	GameManager* get_game_manager() { return gm; }
 
+	void buySkill(int idS, std::string character, Tree* tree);
+
 private:
 	sf::RenderWindow *window;
 	CurrentActiveGUI active_gui;
@@ -52,8 +54,6 @@ private:
 	std::string current_picked_character;
 
 	bool did_active_gui_changed;
-
-	void buySkill(int idS, std::string character, Tree* tree);
 
 	void on_character_select_button();
 	

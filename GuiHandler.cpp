@@ -88,9 +88,9 @@ void GuiHandler::character_selection()
 		this->change_active_gui(GuiHandler::MAINMENU);
 		/*current_character--;
 		current_character < 0 ? character_count - 1 : current_character;
-	
+
 		std::cout << current_character << "\n";*/
-//		label->setText("Alakazam");
+		//		label->setText("Alakazam");
 		//this->set_active_gui_changed(true);
 	});
 	gui->add(button2);
@@ -184,14 +184,14 @@ void GuiHandler::statistics()
 	gui->add(statisticsPicture);
 
 	//Set values
-	skillpoints_request << 4 << std::string("Valium");//current_picked_character;
+	skillpoints_request << 4 << current_picked_character;
 	network_handler->send_packet(skillpoints_request);
 
 	sf::Packet recived_skillpoints = network_handler->recive_packet();
 
 	tree.setSkillPoints(tree.AvailablePoints(recived_skillpoints));
 
-	skills_request << 2 << std::string("Valium");//current_picked_character;
+	skills_request << 2 << current_picked_character;
 	network_handler->send_packet(skills_request);
 
 	sf::Packet recived_skills = network_handler->recive_packet();
@@ -315,7 +315,7 @@ void GuiHandler::statistics()
 		buttonFK1->setPosition(538, 266);
 		gui->add(buttonFK1);
 	}
-	else if(tree.getStatus(1) == 1){
+	else if (tree.getStatus(1) == 1) {
 		tgui::Picture::Ptr buttonFK1 = tgui::Picture::create("Graphics/SkillTreeButtons/SkillTreeButton_locked.png");
 		buttonFK1->setSize(24, 24);
 		buttonFK1->setPosition(538, 266);
@@ -365,7 +365,7 @@ void GuiHandler::statistics()
 		tgui::Picture::Ptr buttonFW1 = tgui::Picture::create("Graphics/SkillTreeButtons/SkillTreeFire_W.png");
 		buttonFW1->setSize(24, 24);
 		buttonFW1->setPosition(554, 250);
-		buttonFW1->connect("clicked", &GuiHandler::buySkill, this, 3, std::string("Valium")/*current_picked_character*/, &tree);
+		buttonFW1->connect("clicked", &GuiHandler::buySkill, this, 3, current_picked_character, &tree);
 		gui->add(buttonFW1);
 	}
 	//
@@ -385,7 +385,7 @@ void GuiHandler::statistics()
 		tgui::Picture::Ptr buttonFV2 = tgui::Picture::create("Graphics/SkillTreeButtons/SkillTreeFire_V.png");
 		buttonFV2->setSize(24, 24);
 		buttonFV2->setPosition(522, 250);
-		buttonFV2->connect("clicked", &GuiHandler::buySkill, this, 4, std::string("Valium") /*current_picked_character*/, &tree);
+		buttonFV2->connect("clicked", &GuiHandler::buySkill, this, 4, current_picked_character, &tree);
 		gui->add(buttonFV2);
 	}
 	//
@@ -1477,7 +1477,7 @@ void GuiHandler::login()
 	tgui::EditBox::Ptr editbox0 = tgui::EditBox::create();
 	tgui::EditBox::Ptr editbox1 = tgui::EditBox::create();
 	tgui::EditBox::Ptr editbox2 = tgui::EditBox::create();
-	
+
 	editbox0->setSize(200, 30);
 	editbox0->setPosition(550, 370);
 	editbox0->setDefaultText("IP address");
@@ -1512,23 +1512,23 @@ void GuiHandler::login()
 
 		//if (logged)
 		//{
-			set_active_gui_changed(logged);
-			change_active_gui(CurrentActiveGUI::CHARACTERSELECTION);
-			this->set_account_name(editbox1->getText().toAnsiString());
+		set_active_gui_changed(logged);
+		change_active_gui(CurrentActiveGUI::CHARACTERSELECTION);
+		this->set_account_name(editbox1->getText().toAnsiString());
 		//}
 
 
 	});
-/*	button0->connect("pressed", [](tgui::EditBox::Ptr editbox0, tgui::EditBox::Ptr editbox1) {
-		std::cout << "-->login get: " << std::endl;
-		std::cout << "username: " << editbox0->getText().toAnsiString() << std::endl;
-		std::cout << "password: " << editbox1->getText().toAnsiString() << std::endl;
+	/*	button0->connect("pressed", [](tgui::EditBox::Ptr editbox0, tgui::EditBox::Ptr editbox1) {
+	std::cout << "-->login get: " << std::endl;
+	std::cout << "username: " << editbox0->getText().toAnsiString() << std::endl;
+	std::cout << "password: " << editbox1->getText().toAnsiString() << std::endl;
 	});*/
 
 	/*button0->connect("pressed", [=]() {
-		this->set_active_gui_changed(true);
-		this->change_active_gui(GuiHandler::CHARACTERSELECTION);
-		std::cout << "change status " << this->get_status() << " DONE\n";
+	this->set_active_gui_changed(true);
+	this->change_active_gui(GuiHandler::CHARACTERSELECTION);
+	std::cout << "change status " << this->get_status() << " DONE\n";
 	});*/
 	gui->add(button0);
 
@@ -1594,14 +1594,18 @@ void GuiHandler::change_active_gui(CurrentActiveGUI gui)
 
 void GuiHandler::buySkill(int idS, std::string character, Tree* tree)
 {
-	sf::Packet request_packet = tree->buyRequest(character, idS+1);
+	sf::Packet request_packet = tree->buyRequest(character, idS + 1);
 	network_handler->send_packet(request_packet);
 	sf::Packet request_result_packet = network_handler->recive_packet();
 	bool request_result;
 	request_result_packet >> request_result;
 	std::cout << request_result << std::endl;
+
 	if (request_result) {
-		tree->buySkill(idS);
+		this->set_active_gui_changed(true);
+		this->change_active_gui(GuiHandler::PLAYERSTATISTIC);
+		std::cout << "change status " << this->get_status() << " DONE\n";
+		//tree->buySkill(idS);
 	}
 }
 
