@@ -22,7 +22,12 @@ Trap_stats::~Trap_stats()
 bool Trap_stats::has_ended()
 {
 	//std::cout << duration_timer.getElapsedTime().asSeconds() << " " << duration_time << " " << (duration_timer.getElapsedTime().asSeconds() > duration_time) << "\n";
-	return duration_timer.getElapsedTime().asSeconds() > 10; //nie wiem czemu duration_time == 0 ???!!
+	return duration_timer.getElapsedTime().asSeconds() > duration_time; //nie wiem czemu duration_time == 0 ???!!
+}
+
+void Trap_stats::setDuration(float duration)
+{
+	duration_time = duration;
 }
 
 void Trap_stats::set_trap_holded_status(Element e)

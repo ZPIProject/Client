@@ -14,6 +14,8 @@ public:
 	
 	float get_radius() { return radius; }
 	Status get_status() { return holded_status; }
+
+	void setDuration(float duration);
 private:
 	float radius;
 	

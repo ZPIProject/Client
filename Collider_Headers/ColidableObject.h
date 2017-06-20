@@ -15,6 +15,7 @@ class ColidableObject
 		virtual void onCollision(ColidableObject* object) = 0;
 		void deactivate();
 		bool getActiveStatus();
+		void setActiveStatus(bool value);
 	protected:
 		Collider* collider;
 		bool is_active;

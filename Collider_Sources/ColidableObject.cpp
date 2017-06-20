@@ -41,3 +41,8 @@
 		return is_active;
 	}
 
+	void ColidableObject::setActiveStatus(bool value)
+	{
+		is_active = value;
+	}
+
