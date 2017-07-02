@@ -346,7 +346,7 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	separator = new Separator();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
 	current_game_state = GAME_IN_PROGRES;
-	want_to_run_with_connection_to_server = false;
+	want_to_run_with_connection_to_server = true;
 	//inicjalizacja obs³ugi sieci
 	network_handler = network;
 }
