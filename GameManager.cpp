@@ -92,10 +92,10 @@ void GameManager::event_handler()
 	{
 		if (event.type == sf::Event::Closed)
 			main_window->close();
-		else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
+		else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right && main_window->hasFocus()) {
 			is_pattern_drawn = true;
 		}
-		else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
+		else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right && main_window->hasFocus()) {
 			is_pattern_drawn = false;
 		}
 		if (event.type == sf::Event::KeyPressed)
@@ -141,16 +141,16 @@ void GameManager::logic_handler()
 
 	sf::Mouse mouse;
 	int directionX = 0, directionY = 0;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && main_window->hasFocus())
 		directionX = -1;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && main_window->hasFocus())
 		directionX = 1;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && main_window->hasFocus())
 		directionY = -1;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && main_window->hasFocus())
 		directionY = 1;
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && main_window->hasFocus() ) {
 		cast_spell();
 	}
 
@@ -178,8 +178,8 @@ void GameManager::logic_handler()
 	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
 	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
 
-	collision_handler.clear();
-	for (int i = 0; i < balls_vector.size(); i++)
+	//collision_handler.clear();
+	/*for (int i = 0; i < balls_vector.size(); i++)
 		collision_handler.add_object(balls_vector[i]);
 	for (int i = 0; i < trap_vector.size(); i++)
 		collision_handler.add_object(trap_vector[i]);
@@ -196,7 +196,7 @@ void GameManager::logic_handler()
 	collision_handler.check_objects_which_colide();
 
 	if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(3);
-	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);
+	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);*/
 }
 
 void GameManager::managePattern()
@@ -213,9 +213,9 @@ void GameManager::cast_spell()
 	if (active_spell>0 && active_element>0) {
 		if (active_spell == 7 && ball_cooldown.getElapsedTime().asMilliseconds() > 500)
 		{
-			if (local_player->getMana() >= 60)
+			if (local_player->getMana() >= 10)
 			{
-				local_player->decMana(60);
+				local_player->decMana(10);
 				//Ball_stats configuration
 				float damage = local_player->getPlayerStats()->get_base_dmg();
 				if (draw_precision_spell > 0.95 && draw_precision_element > 0.95) damage *= 1.5;
@@ -231,7 +231,7 @@ void GameManager::cast_spell()
 				ball.on_cast_set_direction(local_player->getShape().getRotation());
 				balls_vector.push_back(ball);
 				balls_to_send.push_back(ball);
-
+				std::cout << "ball_to_send size " << balls_to_send.size() << "\n";
 				ball_cooldown.restart();
 			}
 		}
@@ -281,7 +281,7 @@ void GameManager::cast_spell()
 
 void GameManager::setActiveSpellData(double value)
 {
-	if (fmod(value, 1) >= 70) {
+	if (fmod(value, 1) >= 0.70) {
 		if (value > 0) {
 			if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8) {
 				active_spell = (int)value;
@@ -312,7 +312,7 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	separator = new Separator();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
 	current_game_state = GAME_IN_PROGRES;
-	want_to_run_with_connection_to_server = true;
+	//want_to_run_with_connection_to_server = true;
 	//inicjalizacja obs³ugi sieci
 	network_handler = network;
 }
@@ -394,6 +394,7 @@ void GameManager::unpack_player(sf::Packet& recived_packet)
 void GameManager::pack_ball_objects(sf::Packet & packet_to_send)
 {
 	int balls_to_send_size = balls_to_send.size();
+//	std::cout << balls_to_send.size() << "\n";
 	packet_to_send << balls_to_send_size;
 	for (int i = 0; i < balls_to_send_size; i++)
 	{
@@ -404,7 +405,7 @@ void GameManager::pack_ball_objects(sf::Packet & packet_to_send)
 		float radius = balls_to_send[i].get_radius();
 		int element = (int)balls_to_send[i].get_element();
 		//std::cout << "sending: " << start_position_x << " " << start_position_y << " " << rotation << " " << speed << " " << radius << " " << element;
-		packet_to_send << start_position_x << start_position_y << rotation << speed << radius << element << "\n";
+		packet_to_send << start_position_x << start_position_y << rotation << speed << radius << element;
 	}
 	balls_to_send.clear();
 }
@@ -432,6 +433,21 @@ void GameManager::unpack_ball_objects(sf::Packet & recived_packet)
 		balls_vector.push_back(b);
 
 	}
+}
+
+void GameManager::pack_trap_objects(sf::Packet & packet_to_send)
+{
+	int traps_to_send_size = traps_to_send.size();
+	
+	packet_to_send << traps_to_send_size;
+	for (int i = 0; i < traps_to_send_size; i++)
+	{
+
+	}
+}
+
+void GameManager::unpack_trap_objects(sf::Packet & recived_packet)
+{
 }
 
 void GameManager::pack_shield_object(sf::Packet & packet_to_send)

@@ -18,7 +18,7 @@
 
 class GameManager
 {
-	bool want_to_run_with_connection_to_server;
+	bool want_to_run_with_connection_to_server = true;
 	bool is_pattern_drawn;
 	bool exited_from_game = false;
 	bool player_won = false;
@@ -91,8 +91,8 @@ class GameManager
 	void pack_ball_objects(sf::Packet& packet_to_send);
 	void unpack_ball_objects(sf::Packet& recived_packet);
 
-	void pack_trap_objects(sf::Packet& packet_to_send) {};
-	void unpack_trap_objects(sf::Packet& recived_packet) {};
+	void pack_trap_objects(sf::Packet& packet_to_send);
+	void unpack_trap_objects(sf::Packet& recived_packet);
 
 	void pack_shield_object(sf::Packet& packet_to_send);
 	void unpack_shield_object(sf::Packet& packet_to_send);
