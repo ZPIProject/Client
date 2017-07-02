@@ -25,15 +25,19 @@ void GuiHandler::handle_event(sf::Event & event)
 	gui->handleEvent(event);
 }
 
-
 void GuiHandler::character_selection()
 {
+	//Background
+	tgui::Picture::Ptr background = tgui::Picture::create("Graphics/Screens/Menu_bg.png");
+	background->setSize(800, 600);
+	background->setPosition(0, 0);
+	gui->add(background);
+
 	std::vector<std::string> vector_of_images;
 	std::vector<std::string> character_list;
 	sf::Packet character_list_request;
 	int current_character = 0;
 	int character_count;
-
 
 	character_list_request << 13 << current_logged_account;
 	network_handler->send_packet(character_list_request);
@@ -45,7 +49,10 @@ void GuiHandler::character_selection()
 		std::string character_name;
 		recived_list >> character_name;
 		character_list.push_back(character_name);
-		vector_of_images.push_back("Graphics/tempChar.png");
+		std::string image = "Graphics/character/Char";
+		image += std::to_string(i % 3);
+		image += ".png";
+		vector_of_images.push_back(image);
 	}
 
 	tgui::Button::Ptr button0 = tgui::Button::create("Enter");
@@ -54,22 +61,20 @@ void GuiHandler::character_selection()
 	tgui::Button::Ptr button3 = tgui::Button::create(">");
 
 	//tgui::Picture::Ptr characterPicture = tgui::Picture::create("../tempChar.png");
-	tgui::Label::Ptr labelPictureTemp;
+	//tgui::Label::Ptr labelPictureTemp;
+	tgui::Picture::Ptr characterPictureTemp;
 	tgui::Label::Ptr labelCharacterName;
 	if (vector_of_images.size() > 0 && character_list.size() > 0)
 	{
-		labelPictureTemp = tgui::Label::create(vector_of_images[0]);
+		characterPictureTemp = tgui::Picture::create(vector_of_images[0].c_str());
+		//labelPictureTemp = tgui::Label::create(vector_of_images[0]);
 		labelCharacterName = tgui::Label::create(character_list[0]);
 		set_current_character(character_list[0]);
 	}
 
-	//characterPicture->setSize(160, 160);
-	//characterPicture->setPosition(320, 220);
-	//gui->add(characterPicture);
-
-	labelPictureTemp->setSize(160, 160);
-	labelPictureTemp->setPosition(320, 220);
-	gui->add(labelPictureTemp);
+	characterPictureTemp->setSize(160, 160);
+	characterPictureTemp->setPosition(320, 220);
+	gui->add(characterPictureTemp);
 
 	labelCharacterName->setPosition(340, 180);
 	labelCharacterName->setTextColor("white");
@@ -85,7 +90,7 @@ void GuiHandler::character_selection()
 	gui->add(button0);
 
 	button1->setSize(50, 50);
-	button1->setPosition(730, 20);
+	button1->setPosition(700, 500);
 	button1->connect("pressed", [=]() {
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::LOGIN);
@@ -103,7 +108,7 @@ void GuiHandler::character_selection()
 		buttonChar->connect("pressed", [=]() {
 			std::cout << "-->" << i << " pressed() " << std::endl;
 
-			labelPictureTemp->setText(vector_of_images[i]);
+			characterPictureTemp->setTexture(vector_of_images[i].c_str());
 			labelCharacterName->setText(character_list[i]);
 			set_current_character(character_list[i]);
 		});
@@ -112,6 +117,12 @@ void GuiHandler::character_selection()
 
 void GuiHandler::main_menu()
 {
+	//Background
+	tgui::Picture::Ptr main_menuBackground = tgui::Picture::create("Graphics/Screens/Menu_bg.png");
+	main_menuBackground->setSize(800, 600);
+	main_menuBackground->setPosition(0, 0);
+	gui->add(main_menuBackground);
+
 	sf::Packet skillpoints_request;
 	sf::Packet skills_request;
 
@@ -194,10 +205,14 @@ void GuiHandler::main_menu()
 	gui->add(button5);
 }
 
-
-
 void GuiHandler::login()
 {
+	//Background
+	tgui::Picture::Ptr loginBackground = tgui::Picture::create("Graphics/Screens/Login_bg.png");
+	loginBackground->setSize(800, 600);
+	loginBackground->setPosition(0, 0);
+	gui->add(loginBackground);
+
 	tgui::Button::Ptr button0 = tgui::Button::create("login");
 	tgui::Button::Ptr button1 = tgui::Button::create("exit");
 	tgui::EditBox::Ptr editbox0 = tgui::EditBox::create();
@@ -220,8 +235,8 @@ void GuiHandler::login()
 	editbox2->setPasswordCharacter('*');
 	gui->add(editbox2);
 
-	button0->setSize(100, 30);
-	button0->setPosition(600, 520);
+	button0->setSize(90, 30);
+	button0->setPosition(550, 520);
 	button0->connect("pressed", [=]()
 	{
 		NetworkHandler* nh = this->get_network_handler();
@@ -258,8 +273,8 @@ void GuiHandler::login()
 	});*/
 	gui->add(button0);
 
-	button1->setSize(50, 50);
-	button1->setPosition(730, 20);
+	button1->setSize(90, 30);
+	button1->setPosition(660, 520);
 	button1->connect("pressed", [&]() { window->close(); });
 	gui->add(button1);
 }
@@ -335,6 +350,10 @@ void GuiHandler::main_loop()
 		}
 		window->clear();
 		draw();
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && (active_gui == CurrentActiveGUI::PLAYERSTATISTIC || active_gui == CurrentActiveGUI::TUTORIAL)) {
+			did_active_gui_changed = true;
+			active_gui = CurrentActiveGUI::MAINMENU;
+		}
 		window->display();
 	}
 }

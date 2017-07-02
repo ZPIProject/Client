@@ -16,9 +16,10 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window->clear(sf::Color(50, 120, 50));
+	main_window->clear();
 
-	main_window->draw(separator->getShape());
+	main_window->draw(background);
+	//main_window->draw(separator->getShape());
 
 	main_window->draw(local_player->getShape());
 	main_window->draw(non_local_player->getShape());
@@ -315,6 +316,11 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	want_to_run_with_connection_to_server = true;
 	//inicjalizacja obs³ugi sieci
 	network_handler = network;
+
+	background_tex = sf::Texture();
+	background_tex.loadFromFile("Graphics/Screens/Battleground1_bg.png");
+	background = sf::Sprite();
+	background.setTexture(background_tex);
 }
 GameManager::~GameManager()
 {
