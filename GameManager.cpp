@@ -308,7 +308,7 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 
 	game_is_running = true;
 	is_pattern_drawn = false;
-	players_initialization();
+	//players_initialization();
 
 	separator = new Separator();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
@@ -355,10 +355,25 @@ void GameManager::game_in_progress()
 	draw();
 }
 
+sf::Packet GameManager::pack_maxHP()
+{
+	sf::Packet packet_to_send;
+	packet_to_send << 1 << 100 + tree->getVitality() * 5;
+	return packet_to_send;
+}
+
+int GameManager::unpack_maxHP(sf::Packet recived_packet)
+{
+	int packet_type = 0;
+	int maxHP = 0;
+	recived_packet >> packet_type >> maxHP;
+	return maxHP;
+}
+
 void GameManager::players_initialization()
 {
-	stats = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium1");
-	stats1 = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium2");
+	stats = new Player_stats(100 + tree->getVitality() * 5, 100 + tree->getVitality() * 5, 100 + tree->getWisdom() * 5, 100 + tree->getWisdom() * 5, 10 + tree->getKnowledge() * 0.1, 100, 100, 100, 100, "Valium1");
+	//stats1 = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium2");
 	local_player = new Player(sf::Color::Red, PLAYER_SIZE, stats);
 	hud = new Player_Hud(stats, stats1);
 	local_status_hud = new Status_Hud();
@@ -379,7 +394,6 @@ void GameManager::players_initialization()
 
 void GameManager::pack_player(sf::Packet& packet_to_send)
 {
-
 	packet_to_send << local_player->getPosition().x << local_player->getPosition().y << local_player->getShape().getRotation();
 }
 

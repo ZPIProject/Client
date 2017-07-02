@@ -50,6 +50,8 @@ class GameManager
 	Shield local_shield;
 	Shield non_local_shield;
 
+	Tree* tree;
+
 	std::vector<Ball> balls_vector;
 	std::vector<Ball> balls_to_send;
 	std::vector<Trap> trap_vector;
@@ -82,8 +84,6 @@ class GameManager
 	void managePattern();
 	void cast_spell();
 	void game_in_progress();
-
-	void players_initialization();
 	
 	void pack_player(sf::Packet& packet_to_send);
 	void unpack_player(sf::Packet& recived_packet);
@@ -105,7 +105,13 @@ public:
 	GameManager(NetworkHandler* network, sf::RenderWindow& window);
 	~GameManager();
 
+	sf::Packet pack_maxHP();
+	int unpack_maxHP(sf::Packet recived_packet);
+
+	void setTree(Tree* tree) { this->tree = tree; }
+	void setEnemyStats(int maxHP) { stats1 = new Player_stats(maxHP, maxHP, 100, 100, 10, 100, 100, 100, 100, "Valium2"); }
 	bool get_player_win_status() { return player_won; }
+	void players_initialization();
 	void run();
 };
 

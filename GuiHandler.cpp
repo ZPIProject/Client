@@ -144,6 +144,8 @@ void GuiHandler::main_menu()
 	tree->databaseUpdate(recived_skills);
 	tree->count_all();
 
+	gm->setTree(tree);
+
 	std::cout << "main_menu\n";
 	tgui::Button::Ptr button0 = tgui::Button::create("Play");
 	tgui::Button::Ptr button1 = tgui::Button::create("Stats");
@@ -325,6 +327,13 @@ void GuiHandler::end_game(bool current_player_won)
 
 void GuiHandler::game()
 {
+	sf::Packet send_packet = gm->pack_maxHP();
+	network_handler->send_packet(send_packet);
+	sf::Packet recived_packet = network_handler->recive_packet();
+	int enemy_max_hp = gm->unpack_maxHP(recived_packet);
+	//std::cout << enemy_max_hp << std::endl;
+	gm->setEnemyStats(enemy_max_hp);
+	gm->players_initialization();
 	gm->run();
 	this->change_active_gui(GuiHandler::ENDGAME);
 	gui->removeAllWidgets();
