@@ -17,7 +17,7 @@ GuiHandler::GuiHandler(sf::RenderWindow & win)
 	active_gui = CurrentActiveGUI::LOGIN;
 	login();
 	did_active_gui_changed = false;
-	gm = new GameManager(network_handler, *window);
+	gm = new GameManager(network_handler, *window, *tree);
 }
 
 void GuiHandler::handle_event(sf::Event & event)
@@ -311,6 +311,7 @@ void GuiHandler::end_game(bool current_player_won)
 void GuiHandler::game()
 {
 	gm->run();
+	gm->reset_game_has_ended();
 	this->change_active_gui(GuiHandler::ENDGAME);
 	gui->removeAllWidgets();
 	end_game(gm->get_player_win_status());

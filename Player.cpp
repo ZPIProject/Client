@@ -15,7 +15,10 @@ Player::Player(sf::Color players_color, float player_size, Player_stats* stts) :
 
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
-		circle->setPosition(player_shape.getPosition());
+		sf::Vector2f fixed_position;
+		fixed_position.x = player_shape.getPosition().x;
+		fixed_position.y = player_shape.getPosition().y;
+		circle->setPosition(fixed_position);
 		//std::cout << "Player_constructor: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
 	}
 }
@@ -31,6 +34,9 @@ void Player::setPosition(double x, double y)
 	player_shape.setPosition(x, y);
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
+		sf::Vector2f fixed_position;
+		fixed_position.x = x - (PLAYER_SIZE);
+		fixed_position.y = y;
 		circle->setPosition(player_shape.getPosition());
 	//	std::cout << "Player_setPosition: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
 	}
@@ -39,6 +45,14 @@ void Player::setPosition(double x, double y)
 void Player::setPosition(sf::Vector2f position)
 {
 	player_shape.setPosition(position);
+	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
+	{
+		sf::Vector2f fixed_position;
+		fixed_position.x = player_shape.getPosition().x;
+		fixed_position.y = player_shape.getPosition().y;
+
+		circle->setPosition(fixed_position);
+	}
 }
 
 void Player::setRotation(double rot)
@@ -71,6 +85,10 @@ void Player::move(int directionX, int directionY)
 
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
+		sf::Vector2f fixed_position;
+		fixed_position.x = player_shape.getPosition().x;
+		fixed_position.y = player_shape.getPosition().y;
+
 		circle->setPosition(player_shape.getPosition());
 		//std::cout << "Player_movement: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
 	}
@@ -130,7 +148,7 @@ void Player::onCollision(ColidableObject* object)
 			else current_status[getIdInVectorStatus(1)].restartDuration();
 			break;
 		case 4:
-			if (!hasElement(current_status, 4)) current_status.push_back(StatusStringHud(4, "Stun", 15));
+			if (!hasElement(current_status, 4)) current_status.push_back(StatusStringHud(4, "Stun", 1));
 			else current_status[getIdInVectorStatus(4)].restartDuration();
 			break;
 		case 5:
