@@ -299,18 +299,18 @@ void GuiHandler::tutorial()
 }
 
 void GuiHandler::end_game(bool current_player_won)
-{
-	std::cout << current_picked_character << (current_player_won ? " won" : " lost" )<< "\n";
+{	
+	std::cout << current_picked_character << (current_player_won ? " won" : " lost") << "\n";
+	current_player_won ? add_exp(10) : add_exp(3);
+	check_if_lvlup();
 	tgui::Label::Ptr end_game_text = tgui::Label::create();
 	tgui::Button::Ptr main_menu_button = tgui::Button::create("Menu");
-
 	std::string tmp = "Game has ended";
 	end_game_text->setText(tmp);
 	end_game_text->setTextSize(20);
 	end_game_text->setPosition(325, 300);
 	gui->add(end_game_text);
 
-	
 
 	main_menu_button->setSize(100, 30);
 	main_menu_button->setPosition(350, 350);
@@ -1729,4 +1729,54 @@ void GuiHandler::statistics()
 		buttonWaS->connect("clicked", &GuiHandler::buySkill, this, 52, current_picked_character, tree);
 		gui->add(buttonWaS);
 	}
+}
+bool GuiHandler::check_if_lvlup()
+{
+	int should_have_level = (get_character_exp()+ 250)/20;
+	if (should_have_level > get_character_level()) {
+		send_lvl_up_to_DB();
+		return true;
+	}
+	return false;
+}
+
+bool GuiHandler::add_exp(int ammount)
+{
+	sf::Packet to_send = sf::Packet();
+	to_send << 10 << current_picked_character << ammount;
+	network_handler->send_packet(to_send);
+	sf::Packet rec = sf::Packet();
+	rec = network_handler->recive_packet();
+	return true;
+}
+
+int GuiHandler::get_character_level()
+{
+	sf::Packet to_send = sf::Packet();
+	to_send << 14 << current_picked_character;
+	network_handler->send_packet(to_send);
+	sf::Packet received = network_handler->recive_packet();
+	int level;
+	received >> level;
+	return level;
+}
+
+int GuiHandler::get_character_exp()
+{
+	sf::Packet to_send = sf::Packet();
+	to_send << 15 << current_picked_character;
+	network_handler->send_packet(to_send);
+	sf::Packet received = network_handler->recive_packet();
+	int exp;
+	received >> exp;
+	return exp;
+}
+
+void GuiHandler::send_lvl_up_to_DB()
+{
+	
+	sf::Packet to_send = sf::Packet();
+	to_send << 9 << current_picked_character;
+	network_handler->send_packet(to_send);
+	network_handler->recive_packet();
 }
