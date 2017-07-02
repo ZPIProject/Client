@@ -19,7 +19,7 @@ public:
 		TUTORIAL,
 		GAME
 	};
-	
+
 	void set_active_gui_changed(bool b) { did_active_gui_changed = b; }
 	void change_status();
 	void change_active_gui(CurrentActiveGUI gui);
@@ -37,7 +37,7 @@ public:
 	void draw();
 	void main_loop();
 	void set_account_name(std::string name) { current_logged_account = name; }
-
+	void set_current_character(std::string name) { current_picked_character = name; }
 	NetworkHandler* get_network_handler() { return network_handler; }
 	GameManager* get_game_manager() { return gm; }
 
@@ -57,6 +57,5 @@ private:
 	bool did_active_gui_changed;
 
 	void on_character_select_button();
-	
-};
 
+};

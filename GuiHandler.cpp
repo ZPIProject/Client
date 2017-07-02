@@ -25,8 +25,10 @@ void GuiHandler::handle_event(sf::Event & event)
 	gui->handleEvent(event);
 }
 
+
 void GuiHandler::character_selection()
 {
+	std::vector<std::string> vector_of_images;
 	std::vector<std::string> character_list;
 	sf::Packet character_list_request;
 	int current_character = 0;
@@ -43,23 +45,34 @@ void GuiHandler::character_selection()
 		std::string character_name;
 		recived_list >> character_name;
 		character_list.push_back(character_name);
+		vector_of_images.push_back("Graphics/tempChar.png");
 	}
 
-	tgui::Button::Ptr button0 = tgui::Button::create("Enter the world of MAGIC");
+	tgui::Button::Ptr button0 = tgui::Button::create("Enter");
 	tgui::Button::Ptr button1 = tgui::Button::create("Logout");
 	tgui::Button::Ptr button2 = tgui::Button::create("<");
 	tgui::Button::Ptr button3 = tgui::Button::create(">");
-	tgui::Picture::Ptr characterPicture = tgui::Picture::create("Graphics/tempChar.png");
-	tgui::Label::Ptr label = tgui::Label::create();
-	label->setPosition(340, 180);
-	label->setTextColor("white");
-	gui->add(label, "name_label");
-	label->setText("Abrakadabra");
 
+	//tgui::Picture::Ptr characterPicture = tgui::Picture::create("../tempChar.png");
+	tgui::Label::Ptr labelPictureTemp;
+	tgui::Label::Ptr labelCharacterName;
+	if (vector_of_images.size() > 0 && character_list.size() > 0)
+	{
+		labelPictureTemp = tgui::Label::create(vector_of_images[0]);
+		labelCharacterName = tgui::Label::create(character_list[0]);
+	}
 
-	characterPicture->setSize(160, 160);
-	characterPicture->setPosition(320, 220);
-	gui->add(characterPicture);
+	//characterPicture->setSize(160, 160);
+	//characterPicture->setPosition(320, 220);
+	//gui->add(characterPicture);
+
+	labelPictureTemp->setSize(160, 160);
+	labelPictureTemp->setPosition(320, 220);
+	gui->add(labelPictureTemp);
+
+	labelCharacterName->setPosition(340, 180);
+	labelCharacterName->setTextColor("white");
+	gui->add(labelCharacterName);
 
 	button0->setSize(200, 50);
 	button0->setPosition(300, 500);
@@ -79,32 +92,21 @@ void GuiHandler::character_selection()
 	});
 	gui->add(button1);
 
-	button2->setSize(30, 30);
-	button2->setPosition(70, 300);
-	button2->connect("pressed", [&]() {
-		std::cout << "-->leftPressed() " << std::endl;
-		this->set_active_gui_changed(true);
-		this->change_active_gui(GuiHandler::MAINMENU);
-		/*current_character--;
-		current_character < 0 ? character_count - 1 : current_character;
+	for (int i = 0; i < vector_of_images.size(); i++)
+	{
+		tgui::Button::Ptr buttonChar = tgui::Button::create(std::to_string(i));
+		buttonChar->setSize(30, 30);
+		buttonChar->setPosition(200 + (i * 50), 450);
+		gui->add(buttonChar);
 
-		std::cout << current_character << "\n";*/
-		//		label->setText("Alakazam");
-		//this->set_active_gui_changed(true);
-	});
-	gui->add(button2);
+		buttonChar->connect("pressed", [=]() {
+			std::cout << "-->" << i << " pressed() " << std::endl;
 
-	button3->setSize(30, 30);
-	button3->setPosition(700, 300);
-	button3->connect("pressed", [&current = current_character, count = character_count]() {
-		std::cout << "-->rightPressed() " << std::endl;
-		current++;
-		current >= count ? current = 0 : current;
-
-		std::cout << current << "\n";
-		//this->set_active_gui_changed(true);
-	});
-	gui->add(button3);
+			labelPictureTemp->setText(vector_of_images[i]);
+			labelCharacterName->setText(character_list[i]);
+			set_current_character(character_list[i]);
+		});
+	}
 }
 
 void GuiHandler::main_menu()
@@ -191,6 +193,7 @@ void GuiHandler::main_menu()
 	gui->add(button5);
 }
 
+
 void GuiHandler::statistics()
 {
 	sf::Packet skillpoints_request;
@@ -215,17 +218,17 @@ void GuiHandler::statistics()
 	//Background
 	tgui::Picture::Ptr statisticsPicture = tgui::Picture::create("Graphics/Screens/SkillTree_bg.png");
 	statisticsPicture->setSize(800, 600);
-	statisticsPicture->setPosition(0, 0);
+	statisticsPicture->	setPosition(0, 0);
 	gui->add(statisticsPicture);
-
-	int hpValue_base = 303;
-	int mpValue_base = 123;
 
 	int knoValue_base = tree->getKnowledge();
 	int wisValue_base = tree->getWisdom();
 	int vitValue_base = tree->getVitality();
 
 	int apValue_base = tree->getSkillPoints();
+
+	int hpValue_base = 100 + vitValue_base * 5;
+	int mpValue_base = 100 + wisValue_base * 5;
 
 	//Buttons
 	tgui::Button::Ptr button0 = tgui::Button::create("Save");
