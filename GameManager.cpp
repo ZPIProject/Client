@@ -16,9 +16,10 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window->clear(sf::Color(50, 120, 50));
+	main_window->clear();
 
-	main_window->draw(separator->getShape());
+	main_window->draw(background);
+	//main_window->draw(separator->getShape());
 
 	main_window->draw(local_player->getShape());
 	main_window->draw(non_local_player->getShape());
@@ -80,42 +81,7 @@ void GameManager::draw()
 		main_window->draw(local_shield.getShape());
 	if (non_local_shield.getActiveStatus())
 		main_window->draw(non_local_shield.getShape());
-	main_window->draw(Pattern.getArray());
-	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&non_local_player->getCollider()))
-	//{
-	//	sf::CircleShape point;
-	//	point.setPosition(circle->getPosition());
-	//	point.setRadius(circle->getRadius());
-	//	point.setOutlineThickness(3);
-	//	point.setOutlineColor(sf::Color::Black);
-	//	point.setFillColor(sf::Color(0, 0, 0, 0));
-	//	main_window->draw(point);
-
-	//	sf::Text player_position_and_collider_position;
-	//	player_position_and_collider_position.setString(std::to_string(non_local_player->getPosition().x) + " " + std::to_string(non_local_player->getPosition().y) + " " + std::to_string(circle->getPosition().x) + " " + std::to_string(circle->getPosition().y));
-	//	player_position_and_collider_position.setPosition(0, 300);
-	//	sf::Font font;
-	//	font.loadFromFile("arial.ttf");
-	//	player_position_and_collider_position.setFont(font);
-
-	//	main_window->draw(player_position_and_collider_position);
-	//}
-
-	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&local_player->getCollider()))
-	//{
-	//	sf::CircleShape point;
-	///*	sf::Vector2f fixed_position;
-	//	fixed_position.x = circle->getPosition().x - PLAYER_SIZE / 2;
-	//	fixed_position.y = circle->getPosition().y - PLAYER_SIZE / 2;
-	//	point.setPosition(fixed_position);*/
-	//	point.setPosition(circle->getPosition());
-	//	point.setRadius(circle->getRadius());
-	//	point.setOutlineThickness(3);
-	//	point.setFillColor(sf::Color(0, 0, 0, 0));
-	//	point.setOutlineColor(sf::Color::Black);
-	//	main_window->draw(point);
-	//}
-	
+	main_window->draw(Pattern.getArray());	
 	
 	main_window->display();
 }
@@ -357,11 +323,17 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window, Tr
 	current_game_state = GAME_IN_PROGRES;
 	//want_to_run_with_connection_to_server = true;
 	//inicjalizacja obs³ugi sieci
-	network_handler = network;
+	network_handler = network;\
 	this->tree = &tree;
 
 	local_shield.setActiveStatus(false);
 	non_local_shield.setActiveStatus(false);
+
+	background_tex = sf::Texture();
+	background_tex.loadFromFile("Graphics/Screens/Battleground1_bg.png");
+	background = sf::Sprite();
+	background.setTexture(background_tex);
+
 }
 GameManager::~GameManager()
 {

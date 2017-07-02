@@ -24,16 +24,16 @@ class GameManager
 	bool player_won = false;
 	bool end_game = false;
 
-
-
 	std::string current_username;
 	Pattern_management Pattern;
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
-	
 	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
 	
+	sf::Texture background_tex;
+	sf::Sprite background;
+
 	Separator* separator;
 
 	Player_Hud* hud;
