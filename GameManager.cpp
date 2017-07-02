@@ -16,9 +16,9 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window->clear();
-	main_window->draw(background);
-	//main_window->draw(separator->getShape());
+	main_window->clear(sf::Color(50, 120, 50));
+
+	main_window->draw(separator->getShape());
 
 	main_window->draw(local_player->getShape());
 	main_window->draw(non_local_player->getShape());
@@ -98,6 +98,15 @@ void GameManager::event_handler()
 		else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
 			is_pattern_drawn = false;
 		}
+		if (event.type == sf::Event::KeyPressed)
+		{
+			if (event.key.code == sf::Keyboard::Escape && main_window->hasFocus())
+			{
+				player_won = false;
+				exited_from_game = true;
+				end_game = true;
+			}
+		}
 	}
 }
 
@@ -164,30 +173,30 @@ void GameManager::logic_handler()
 		local_shield.move(local_player->getPosition());
 	}
 
-		managePattern();
+	managePattern();
 
-		balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
-		trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
+	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
+	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
 
-		collision_handler.clear();
-		for (int i = 0; i < balls_vector.size(); i++)
-			collision_handler.add_object(balls_vector[i]);
-		for (int i = 0; i < trap_vector.size(); i++)
-			collision_handler.add_object(trap_vector[i]);
+	collision_handler.clear();
+	for (int i = 0; i < balls_vector.size(); i++)
+		collision_handler.add_object(balls_vector[i]);
+	for (int i = 0; i < trap_vector.size(); i++)
+		collision_handler.add_object(trap_vector[i]);
 
-		collision_handler.add_object(*non_local_player);
-		//collision_handler.add_object(*local_player);
+	collision_handler.add_object(*non_local_player);
+	//collision_handler.add_object(*local_player);
 
-		if (!local_shield.has_ended())
-			collision_handler.add_object(local_shield);
+	if (!local_shield.has_ended())
+		collision_handler.add_object(local_shield);
 
-		if (!non_local_shield.has_ended())
-			collision_handler.add_object(non_local_shield);
+	if (!non_local_shield.has_ended())
+		collision_handler.add_object(non_local_shield);
 
-		collision_handler.check_objects_which_colide();
+	collision_handler.check_objects_which_colide();
 
-		if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(3);
-		if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);
+	if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(3);
+	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);
 }
 
 void GameManager::managePattern()
@@ -277,10 +286,12 @@ void GameManager::setActiveSpellData(double value)
 			if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8) {
 				active_spell = (int)value;
 				draw_precision_spell = fmod(value, 1);
+
 			}
 			else {
 				active_element = (int)value;
 				draw_precision_element = fmod(value, 1);
+
 			}
 			std::cout << draw_precision_spell << " " << draw_precision_element << std::endl;
 			std::cout << active_spell << " " << active_element << std::endl;
@@ -304,10 +315,6 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	want_to_run_with_connection_to_server = true;
 	//inicjalizacja obs³ugi sieci
 	network_handler = network;
-	background_tex = sf::Texture();
-	background_tex.loadFromFile("Graphics/Screens/Battleground1_bg.png");
-	background = sf::Sprite();
-	background.setTexture(background_tex);
 }
 GameManager::~GameManager()
 {
@@ -317,7 +324,7 @@ GameManager::~GameManager()
 }
 void GameManager::run()
 {
-	while (game_is_running)
+	while (!end_game)
 	{
 
 		game_in_progress();
@@ -337,6 +344,8 @@ void GameManager::game_in_progress()
 		pack_all_and_send();
 		recive_and_unpack_all();
 	}
+	
+	check_if_player_has_left();
 	draw();
 }
 
@@ -466,4 +475,25 @@ void GameManager::recive_and_unpack_all()
 	unpack_player(recived_packet);
 	unpack_ball_objects(recived_packet);
 	//unpack_shield_object(recived_packet);
+}
+
+void GameManager::check_if_player_has_left()
+{
+	sf::Packet game_has_ended_packet;
+	game_has_ended_packet << 1 << exited_from_game;
+	network_handler->send_packet(game_has_ended_packet);
+
+	
+	sf::Packet recive_end_game_packet;
+	recive_end_game_packet = network_handler->recive_packet();
+	
+	bool opponent_has_left;
+	int packet_type;
+	recive_end_game_packet >> packet_type >> opponent_has_left;
+
+	if (opponent_has_left)
+	{
+		player_won = opponent_has_left;
+		end_game = true;
+	}
 }

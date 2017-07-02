@@ -60,6 +60,7 @@ void GuiHandler::character_selection()
 	{
 		labelPictureTemp = tgui::Label::create(vector_of_images[0]);
 		labelCharacterName = tgui::Label::create(character_list[0]);
+		set_current_character(character_list[0]);
 	}
 
 	//characterPicture->setSize(160, 160);
@@ -194,10 +195,229 @@ void GuiHandler::main_menu()
 }
 
 
+
+void GuiHandler::login()
+{
+	tgui::Button::Ptr button0 = tgui::Button::create("login");
+	tgui::Button::Ptr button1 = tgui::Button::create("exit");
+	tgui::EditBox::Ptr editbox0 = tgui::EditBox::create();
+	tgui::EditBox::Ptr editbox1 = tgui::EditBox::create();
+	tgui::EditBox::Ptr editbox2 = tgui::EditBox::create();
+
+	editbox0->setSize(200, 30);
+	editbox0->setPosition(550, 370);
+	editbox0->setDefaultText("IP address");
+	gui->add(editbox0);
+
+	editbox1->setSize(200, 30);
+	editbox1->setPosition(550, 420);
+	editbox1->setDefaultText("username");
+	gui->add(editbox1);
+
+	editbox2->setSize(200, 30);
+	editbox2->setPosition(550, 470);
+	editbox2->setDefaultText("password");
+	editbox2->setPasswordCharacter('*');
+	gui->add(editbox2);
+
+	button0->setSize(100, 30);
+	button0->setPosition(600, 520);
+	button0->connect("pressed", [=]()
+	{
+		NetworkHandler* nh = this->get_network_handler();
+		nh->connect(editbox0->getText().toAnsiString());
+
+		sf::Packet packet;
+		packet << 0 << editbox1->getText().toAnsiString() << editbox2->getText().toAnsiString();
+		nh->send_packet(packet);
+		packet.clear();
+
+		packet = nh->recive_packet();
+		bool logged;
+		packet >> logged;
+
+		//if (logged)
+		//{
+		set_active_gui_changed(logged);
+		change_active_gui(CurrentActiveGUI::CHARACTERSELECTION);
+		this->set_account_name(editbox1->getText().toAnsiString());
+		//}
+
+
+	});
+	/*	button0->connect("pressed", [](tgui::EditBox::Ptr editbox0, tgui::EditBox::Ptr editbox1) {
+	std::cout << "-->login get: " << std::endl;
+	std::cout << "username: " << editbox0->getText().toAnsiString() << std::endl;
+	std::cout << "password: " << editbox1->getText().toAnsiString() << std::endl;
+	});*/
+
+	/*button0->connect("pressed", [=]() {
+	this->set_active_gui_changed(true);
+	this->change_active_gui(GuiHandler::CHARACTERSELECTION);
+	std::cout << "change status " << this->get_status() << " DONE\n";
+	});*/
+	gui->add(button0);
+
+	button1->setSize(50, 50);
+	button1->setPosition(730, 20);
+	button1->connect("pressed", [&]() { window->close(); });
+	gui->add(button1);
+}
+
+void GuiHandler::tutorial()
+{
+	tgui::Picture::Ptr tutorialPicture = tgui::Picture::create("Graphics/tutorial.png");
+	tgui::Button::Ptr button0 = tgui::Button::create("Back");
+
+	tutorialPicture->setSize(800, 600);
+	tutorialPicture->setPosition(0, 0);
+	gui->add(tutorialPicture);
+
+	button0->setSize(300, 40);
+	button0->setPosition(250, 550);
+	button0->connect("pressed", [=]() {
+		this->set_active_gui_changed(true);
+		this->change_active_gui(GuiHandler::MAINMENU);
+		std::cout << "change status " << this->get_status() << " DONE\n";
+	});
+	gui->add(button0);
+}
+
+void GuiHandler::end_game(bool current_player_won)
+{
+	std::cout << current_picked_character << (current_player_won ? " won" : " lost" )<< "\n";
+	tgui::Label::Ptr end_game_text = tgui::Label::create();
+	tgui::Button::Ptr main_menu_button = tgui::Button::create("Menu");
+
+	std::string tmp = "Game has ended";
+	end_game_text->setText(tmp);
+	end_game_text->setTextSize(20);
+	end_game_text->setPosition(325, 300);
+	gui->add(end_game_text);
+
+	
+
+	main_menu_button->setSize(100, 30);
+	main_menu_button->setPosition(350, 350);
+	main_menu_button->connect("pressed", [=]() {
+		this->set_active_gui_changed(true);
+		this->change_active_gui(GuiHandler::MAINMENU);
+	}
+	);
+	gui->add(main_menu_button);
+}
+
+
+void GuiHandler::game()
+{
+	gm->run();
+	this->change_active_gui(GuiHandler::ENDGAME);
+	gui->removeAllWidgets();
+	end_game(gm->get_player_win_status());
+}
+
+void GuiHandler::draw()
+{
+	change_status();
+	gui->draw();
+}
+
+void GuiHandler::main_loop()
+{
+	while (window->isOpen())
+	{
+		sf::Event event;
+		while (window->pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window->close();
+			handle_event(event);
+		}
+		window->clear();
+		draw();
+		window->display();
+	}
+}
+
+void GuiHandler::change_active_gui(CurrentActiveGUI gui)
+{
+	//change_status();
+	active_gui = gui;
+	std::cout << "change_active_gui" << (int)gui << "\n";
+}
+
+void GuiHandler::buySkill(int idS, std::string character, Tree* tree)
+{
+	sf::Packet request_packet = tree->buyRequest(character, idS + 1);
+	network_handler->send_packet(request_packet);
+	sf::Packet request_result_packet = network_handler->recive_packet();
+	bool request_result;
+	request_result_packet >> request_result;
+	std::cout << request_result << std::endl;
+
+	if (request_result) {
+		this->set_active_gui_changed(true);
+		this->change_active_gui(GuiHandler::PLAYERSTATISTIC);
+		std::cout << "change status " << this->get_status() << " DONE\n";
+		//tree->buySkill(idS);
+	}
+}
+
+void GuiHandler::on_character_select_button()
+{
+	std::cout << "-->characterPressed() " << std::endl;
+	did_active_gui_changed = true;
+	active_gui = CurrentActiveGUI::MAINMENU;
+}
+
+void GuiHandler::change_status()
+{
+
+	if (did_active_gui_changed)
+	{
+	
+		switch (active_gui)
+		{
+		case MAINMENU:
+			gui->removeAllWidgets();
+			main_menu();
+			break;
+		case LOGIN:
+			gui->removeAllWidgets();
+			login();
+			break;
+		case CHARACTERSELECTION:
+			gui->removeAllWidgets();
+			character_selection();
+			break;
+		case PLAYERSTATISTIC:
+			gui->removeAllWidgets();
+			statistics();
+			break;
+		case TUTORIAL:
+			gui->removeAllWidgets();
+			tutorial();
+			break;
+		case GAME:
+			gui->removeAllWidgets();
+			game();
+			break;
+		case ENDGAME:
+			gui->removeAllWidgets();
+			end_game(gm->get_player_win_status());
+			break;
+		default:
+			break;
+		}
+		did_active_gui_changed = false;
+	}
+}
 void GuiHandler::statistics()
 {
 	sf::Packet skillpoints_request;
 	sf::Packet skills_request;
+
+	tree = new Tree();
 
 	//Set values
 	skillpoints_request << 4 << current_picked_character;
@@ -218,7 +438,7 @@ void GuiHandler::statistics()
 	//Background
 	tgui::Picture::Ptr statisticsPicture = tgui::Picture::create("Graphics/Screens/SkillTree_bg.png");
 	statisticsPicture->setSize(800, 600);
-	statisticsPicture->	setPosition(0, 0);
+	statisticsPicture->setPosition(0, 0);
 	gui->add(statisticsPicture);
 
 	int knoValue_base = tree->getKnowledge();
@@ -1489,189 +1709,5 @@ void GuiHandler::statistics()
 		buttonWaS->setPosition(389, 301);
 		buttonWaS->connect("clicked", &GuiHandler::buySkill, this, 52, current_picked_character, tree);
 		gui->add(buttonWaS);
-	}
-}
-
-void GuiHandler::login()
-{
-	tgui::Button::Ptr button0 = tgui::Button::create("login");
-	tgui::Button::Ptr button1 = tgui::Button::create("exit");
-	tgui::EditBox::Ptr editbox0 = tgui::EditBox::create();
-	tgui::EditBox::Ptr editbox1 = tgui::EditBox::create();
-	tgui::EditBox::Ptr editbox2 = tgui::EditBox::create();
-
-	editbox0->setSize(200, 30);
-	editbox0->setPosition(550, 370);
-	editbox0->setDefaultText("IP address");
-	gui->add(editbox0);
-
-	editbox1->setSize(200, 30);
-	editbox1->setPosition(550, 420);
-	editbox1->setDefaultText("username");
-	gui->add(editbox1);
-
-	editbox2->setSize(200, 30);
-	editbox2->setPosition(550, 470);
-	editbox2->setDefaultText("password");
-	editbox2->setPasswordCharacter('*');
-	gui->add(editbox2);
-
-	button0->setSize(100, 30);
-	button0->setPosition(600, 520);
-	button0->connect("pressed", [=]()
-	{
-		NetworkHandler* nh = this->get_network_handler();
-		nh->connect(editbox0->getText().toAnsiString());
-
-		sf::Packet packet;
-		packet << 0 << editbox1->getText().toAnsiString() << editbox2->getText().toAnsiString();
-		nh->send_packet(packet);
-		packet.clear();
-
-		packet = nh->recive_packet();
-		bool logged;
-		packet >> logged;
-
-		//if (logged)
-		//{
-		set_active_gui_changed(logged);
-		change_active_gui(CurrentActiveGUI::CHARACTERSELECTION);
-		this->set_account_name(editbox1->getText().toAnsiString());
-		//}
-
-
-	});
-	/*	button0->connect("pressed", [](tgui::EditBox::Ptr editbox0, tgui::EditBox::Ptr editbox1) {
-	std::cout << "-->login get: " << std::endl;
-	std::cout << "username: " << editbox0->getText().toAnsiString() << std::endl;
-	std::cout << "password: " << editbox1->getText().toAnsiString() << std::endl;
-	});*/
-
-	/*button0->connect("pressed", [=]() {
-	this->set_active_gui_changed(true);
-	this->change_active_gui(GuiHandler::CHARACTERSELECTION);
-	std::cout << "change status " << this->get_status() << " DONE\n";
-	});*/
-	gui->add(button0);
-
-	button1->setSize(50, 50);
-	button1->setPosition(730, 20);
-	button1->connect("pressed", [&]() { window->close(); });
-	gui->add(button1);
-}
-
-void GuiHandler::tutorial()
-{
-	tgui::Picture::Ptr tutorialPicture = tgui::Picture::create("Graphics/tutorial.png");
-	tgui::Button::Ptr button0 = tgui::Button::create("Back");
-
-	tutorialPicture->setSize(800, 600);
-	tutorialPicture->setPosition(0, 0);
-	gui->add(tutorialPicture);
-
-	button0->setSize(300, 40);
-	button0->setPosition(250, 550);
-	button0->connect("pressed", [=]() {
-		this->set_active_gui_changed(true);
-		this->change_active_gui(GuiHandler::MAINMENU);
-		std::cout << "change status " << this->get_status() << " DONE\n";
-	});
-	gui->add(button0);
-}
-
-void GuiHandler::game()
-{
-	gm->run();
-}
-
-void GuiHandler::draw()
-{
-	change_status();
-	gui->draw();
-}
-
-void GuiHandler::main_loop()
-{
-	while (window->isOpen())
-	{
-		sf::Event event;
-		while (window->pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window->close();
-			handle_event(event);
-		}
-		window->clear();
-		draw();
-		window->display();
-	}
-}
-
-void GuiHandler::change_active_gui(CurrentActiveGUI gui)
-{
-	//change_status();
-	active_gui = gui;
-	std::cout << "change_active_gui" << (int)gui << "\n";
-}
-
-void GuiHandler::buySkill(int idS, std::string character, Tree* tree)
-{
-	sf::Packet request_packet = tree->buyRequest(character, idS + 1);
-	network_handler->send_packet(request_packet);
-	sf::Packet request_result_packet = network_handler->recive_packet();
-	bool request_result;
-	request_result_packet >> request_result;
-	std::cout << request_result << std::endl;
-
-	if (request_result) {
-		this->set_active_gui_changed(true);
-		this->change_active_gui(GuiHandler::PLAYERSTATISTIC);
-		std::cout << "change status " << this->get_status() << " DONE\n";
-		//tree->buySkill(idS);
-	}
-}
-
-void GuiHandler::on_character_select_button()
-{
-	std::cout << "-->characterPressed() " << std::endl;
-	did_active_gui_changed = true;
-	active_gui = CurrentActiveGUI::MAINMENU;
-}
-
-void GuiHandler::change_status()
-{
-	if (did_active_gui_changed)
-	{
-		switch (active_gui)
-		{
-		case MAINMENU:
-			std::cout << "main_menu init\n";
-			gui->removeAllWidgets();
-			main_menu();
-			break;
-		case LOGIN:
-			gui->removeAllWidgets();
-			login();
-			break;
-		case CHARACTERSELECTION:
-			gui->removeAllWidgets();
-			character_selection();
-			break;
-		case PLAYERSTATISTIC:
-			gui->removeAllWidgets();
-			statistics();
-			break;
-		case TUTORIAL:
-			gui->removeAllWidgets();
-			tutorial();
-			break;
-		case GAME:
-			gui->removeAllWidgets();
-			game();
-			break;
-		default:
-			break;
-		}
-		did_active_gui_changed = false;
 	}
 }

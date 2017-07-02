@@ -17,7 +17,8 @@ public:
 		MAINMENU,
 		PLAYERSTATISTIC,
 		TUTORIAL,
-		GAME
+		GAME,
+		ENDGAME
 	};
 
 	void set_active_gui_changed(bool b) { did_active_gui_changed = b; }
@@ -31,6 +32,7 @@ public:
 	void statistics();
 	void login();
 	void tutorial();
+	void end_game(bool current_player_won);
 	void game();
 
 	int get_status() { return (int)active_gui; }

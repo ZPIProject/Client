@@ -18,17 +18,22 @@
 
 class GameManager
 {
+	bool want_to_run_with_connection_to_server;
 	bool is_pattern_drawn;
+	bool exited_from_game = false;
+	bool player_won = false;
+	bool end_game = false;
+
+
+
 	std::string current_username;
 	Pattern_management Pattern;
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
-	bool want_to_run_with_connection_to_server;
-
+	
 	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
-	sf::Texture background_tex;
-	sf::Sprite background;
+	
 	Separator* separator;
 
 	Player_Hud* hud;
@@ -76,14 +81,7 @@ class GameManager
 	void logic_handler();
 	void managePattern();
 	void cast_spell();
-	void loging_menu();
-	void character_selection(std::string username) {};
-	void main_menu();
-	void connecting_to_game();
 	void game_in_progress();
-	void exiting_game();
-	void disconnect();
-
 
 	void players_initialization();
 	
@@ -102,10 +100,12 @@ class GameManager
 
 	void pack_all_and_send();
 	void recive_and_unpack_all();
+	void check_if_player_has_left();
 public:
 	GameManager(NetworkHandler* network, sf::RenderWindow& window);
 	~GameManager();
 
+	bool get_player_win_status() { return player_won; }
 	void run();
 };
 
