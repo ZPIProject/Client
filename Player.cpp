@@ -130,7 +130,7 @@ void Player::onCollision(ColidableObject* object)
 			else current_status[getIdInVectorStatus(1)].restartDuration();
 			break;
 		case 4:
-			if (!hasElement(current_status, 4)) current_status.push_back(StatusStringHud(4, "Stun", 1));
+			if (!hasElement(current_status, 4)) current_status.push_back(StatusStringHud(4, "Stun", 15));
 			else current_status[getIdInVectorStatus(4)].restartDuration();
 			break;
 		case 5:

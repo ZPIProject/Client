@@ -442,6 +442,9 @@ void GameManager::pack_trap_objects(sf::Packet & packet_to_send)
 	packet_to_send << traps_to_send_size;
 	for (int i = 0; i < traps_to_send_size; i++)
 	{
+		float trap_position_x = traps_to_send[i].getPosition().x;
+		float trap_position_y = traps_to_send[i].getPosition().y;
+		int trap_element = (int)traps_to_send[i].getTrapStats().get_element();
 
 	}
 }
