@@ -27,7 +27,8 @@ class GameManager
 
 	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
-	
+	sf::Texture background_tex;
+	sf::Sprite background;
 	Separator* separator;
 
 	Player_Hud* hud;
