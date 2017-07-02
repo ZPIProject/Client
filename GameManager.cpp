@@ -259,7 +259,7 @@ void GameManager::cast_spell()
 				local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
 			}	
 		}
-		active_spell = 0;
+		active_element = 0;
 		draw_precision_spell = draw_precision_element = 0;
 	}
 
