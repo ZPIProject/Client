@@ -16,8 +16,8 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window->clear(sf::Color(50,120,50));
-	
+	main_window->clear(sf::Color(50, 120, 50));
+
 	main_window->draw(separator->getShape());
 
 	main_window->draw(local_player->getShape());
@@ -76,9 +76,9 @@ void GameManager::draw()
 		main_window->draw(trap_vector[i].getShape());
 	}
 
-	if(!local_shield.has_ended())
+	if (!local_shield.has_ended())
 		main_window->draw(local_shield.getShape());
-	if(!non_local_shield.has_ended())
+	if (!non_local_shield.has_ended())
 		main_window->draw(non_local_shield.getShape());
 
 	main_window->draw(Pattern.getArray());
@@ -92,8 +92,8 @@ void GameManager::event_handler()
 	{
 		if (event.type == sf::Event::Closed)
 			main_window->close();
-		else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right){	
-			is_pattern_drawn = true;		
+		else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
+			is_pattern_drawn = true;
 		}
 		else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
 			is_pattern_drawn = false;
@@ -108,17 +108,17 @@ void GameManager::logic_handler()
 	hud->setOpponentHpText("HP:" + hud->Convert((stats1->get_current_health() / stats1->get_MAX_health()) * 100) + "%");
 
 	local_player->incMana();
-	
+
 	std::vector<StatusStringHud> status_local = local_player->getCurrent_status();
 	std::vector<int> vector;
 	for (StatusStringHud s : status_local) {
 		if (!s.has_ended()) {
 			int id = s.getId();
-			if (id==1) vector.push_back(1);		//Debuff
+			if (id == 1) vector.push_back(1);		//Debuff
 			else if (id == 4) { vector.push_back(2); s.setDuration(1); }//Stun
-			else if (id==5) vector.push_back(3);//Damage
-			else if (id==6) vector.push_back(4);//Confusion
-			else if (id==9) vector.push_back(5);//Slow
+			else if (id == 5) vector.push_back(3);//Damage
+			else if (id == 6) vector.push_back(4);//Confusion
+			else if (id == 9) vector.push_back(5);//Slow
 		}
 	}
 
@@ -151,55 +151,55 @@ void GameManager::logic_handler()
 		directionX = -1 * directionX;
 		directionY = -1 * directionY;
 	}
-	
+
 	if (local_player->getPosition().x + directionX >= PLAYER_SIZE / 2 &&
 		local_player->getPosition().x + directionX <= WINDOW_WIDTH - PLAYER_SIZE / 2 &&
 		local_player->getPosition().y + directionY <= WINDOW_HEIGHT - PLAYER_SIZE / 2 - 1 &&
 		local_player->getPosition().y + directionY >= WINDOW_HEIGHT / 2 + SEPARATOR_HEIGHT / 2 + PLAYER_SIZE / 2 + 2)
 		if (std::find(vector.begin(), vector.end(), 2) != vector.end());
 		else local_player->move(directionX, directionY);
-	local_shield.move(local_player->getPosition());
-	managePattern();
+		local_shield.move(local_player->getPosition());
+		managePattern();
 
-	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
-	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
+		balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
+		trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
 
-	collision_handler.clear();
-	for (int i = 0; i < balls_vector.size(); i++)
-		collision_handler.add_object(balls_vector[i]);
-	for (int i = 0; i < trap_vector.size(); i++)
-		collision_handler.add_object(trap_vector[i]);
-	
-	collision_handler.add_object(*non_local_player);
-	//collision_handler.add_object(*local_player);
-	
-	if(!local_shield.has_ended())
-		collision_handler.add_object(local_shield);
+		collision_handler.clear();
+		for (int i = 0; i < balls_vector.size(); i++)
+			collision_handler.add_object(balls_vector[i]);
+		for (int i = 0; i < trap_vector.size(); i++)
+			collision_handler.add_object(trap_vector[i]);
 
-	if (!non_local_shield.has_ended())
-		collision_handler.add_object(non_local_shield);
+		collision_handler.add_object(*non_local_player);
+		//collision_handler.add_object(*local_player);
 
-	collision_handler.check_objects_which_colide();
+		if (!local_shield.has_ended())
+			collision_handler.add_object(local_shield);
 
-	if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(3);
-	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);
+		if (!non_local_shield.has_ended())
+			collision_handler.add_object(non_local_shield);
+
+		collision_handler.check_objects_which_colide();
+
+		if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(3);
+		if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);
 }
 
 void GameManager::managePattern()
 {
 	if (sf::Mouse::getPosition(*main_window).x >= 0 && sf::Mouse::getPosition(*main_window).y >= 0 && sf::Mouse::getPosition(*main_window).x < main_window->getSize().x, sf::Mouse::getPosition(*main_window).y < main_window->getSize().y) {
-		double P_Double= Pattern.manage_pattern(sf::Mouse::getPosition(*main_window).x, sf::Mouse::getPosition(*main_window).y, is_pattern_drawn);
-		if(P_Double>0)std::cout << P_Double<<std::endl;
+		double P_Double = Pattern.manage_pattern(sf::Mouse::getPosition(*main_window).x, sf::Mouse::getPosition(*main_window).y, is_pattern_drawn);
+		if (P_Double>0)std::cout << P_Double << std::endl;
 		setActiveSpellData(P_Double);
 	}
 }
 
 void GameManager::cast_spell()
 {
-	if(active_spell>0 && active_element>0){
+	if (active_spell>0 && active_element>0) {
 		if (active_spell == 7 && ball_cooldown.getElapsedTime().asMilliseconds() > 500)
 		{
-			if (local_player->getMana() >= 60) 
+			if (local_player->getMana() >= 60)
 			{
 				local_player->decMana(60);
 				//Ball_stats configuration
@@ -207,7 +207,7 @@ void GameManager::cast_spell()
 				if (draw_precision_spell > 0.95 && draw_precision_element > 0.95) damage *= 1.5;
 				else if (draw_precision_spell > 0.9 || draw_precision_element > 0.9) damage *= 1.2;
 				else if (draw_precision_spell < 0.7 && draw_precision_element > 0.7) damage *= 0.8;
-				
+
 				float speed = PROJECTILE_STANDARD_SPEED;
 				float radius = 10;
 				Element e = (Element)active_element;
@@ -223,7 +223,7 @@ void GameManager::cast_spell()
 		}
 		if (active_spell == 8 && trap_cooldown.getElapsedTime().asMilliseconds() > 500)
 		{
-			if (local_player->getMana() >= 40) 
+			if (local_player->getMana() >= 40)
 			{
 				local_player->decMana(40);
 
@@ -245,7 +245,7 @@ void GameManager::cast_spell()
 		}
 		if (active_spell == 3 && !local_shield.has_ended())
 		{
-			if (local_player->getMana() >= 20) 
+			if (local_player->getMana() >= 20)
 			{
 				local_player->decMana(20);
 
@@ -257,13 +257,14 @@ void GameManager::cast_spell()
 				else if (draw_precision_spell < 0.70 && draw_precision_element > 0.70) duration *= 0.8;
 
 				local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
-			}	
+			}
 		}
 		active_element = 0;
 		draw_precision_spell = draw_precision_element = 0;
 	}
 
 }
+
 void GameManager::setActiveSpellData(double value)
 {
 	if (value > 0) {
@@ -278,59 +279,7 @@ void GameManager::setActiveSpellData(double value)
 		std::cout << draw_precision_spell << " " << draw_precision_element << std::endl;
 		std::cout << active_spell << " " << active_element << std::endl;
 	}
-	
-}
 
-void GameManager::loging_menu()
-{
-	std::string ip_adress;
-	std::string username;
-	std::string password;
-
-	std::cout << "Czy chcesz odpaliæ klienta z po³¹czeniem do serwera(tak) lub bez (nie) ";
-	std::cin >> ip_adress;
-	want_to_run_with_connection_to_server = ip_adress == "tak";
-	if (want_to_run_with_connection_to_server)
-	{
-		std::cout << "\nPodaj ip serwera: ";
-		std::cin >> ip_adress;
-		std::cout << "Podaj username: ";
-		std::cin >> username;
-		std::cout << "Podaj haslo: ";
-		std::cin >> password;
-
-
-		if (network_handler->connect(ip_adress))
-		{// tutaj sprawdzanie czy has³o zosta³o poprawnie wprowadzone i czy username jest z nim zgodne
-			sf::Packet login_information_to_send;
-			login_information_to_send << 0 << username << password; //0 = LOGIN_PACKET
-
-			network_handler->send_packet(login_information_to_send);
-			std::cout << "wys³ano pakiet\n";
-			sf::Packet recived = network_handler->recive_packet();
-			std::cout << "odebrano pakiet\n";
-			bool logged;
-			recived >> logged;
-			std::cout << "logged:" << logged << "\n";
-			if (logged)
-			{
-				change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
-				
-			}
-		}
-	}
-	else
-	{
-		change_game_state(GAME_IN_PROGRES); // tutaj powinno byc przejscie do connecting_to_server(), ale dla szybszego testowania jest od razu ³aczenie do gry
-		
-	}
-}
-
-void GameManager::main_menu()
-{
-}
-void GameManager::connecting_to_game()
-{
 }
 
 GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
@@ -342,7 +291,7 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	game_is_running = true;
 	is_pattern_drawn = false;
 	players_initialization();
-	
+
 	separator = new Separator();
 	//ustawienie stanu pocz¹tkowego gry(menu logowania)
 	current_game_state = GAME_IN_PROGRES;
@@ -360,15 +309,15 @@ void GameManager::run()
 {
 	while (game_is_running)
 	{
-		
+
 		game_in_progress();
 	}
 }
 void GameManager::game_in_progress()
 {
-	
+
 	event_handler();
-	if (frame_rate_controller.getElapsedTime().asMilliseconds() > 10)
+	if (frame_rate_controller.getElapsedTime().asMilliseconds() > 20)
 	{
 		logic_handler();
 		frame_rate_controller.restart();
@@ -381,25 +330,17 @@ void GameManager::game_in_progress()
 	draw();
 }
 
-void GameManager::exiting_game()
-{
-}
-
-void GameManager::disconnect()
-{
-}
-
 void GameManager::players_initialization()
 {
-	stats = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100,"Valium1");
+	stats = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium1");
 	stats1 = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium2");
 	local_player = new Player(sf::Color::Red, PLAYER_SIZE, stats);
 	hud = new Player_Hud(stats, stats1);
 	local_status_hud = new Status_Hud();
 	non_local_status_hud = new Status_Hud();
 	current_spell_hud = new Current_Spell_Hud();
-	int local_player_position_x = (WINDOW_WIDTH/2);
-	int local_player_position_y = (WINDOW_HEIGHT - 2*local_player->getShape().getRadius());
+	int local_player_position_x = (WINDOW_WIDTH / 2);
+	int local_player_position_y = (WINDOW_HEIGHT - 2 * local_player->getShape().getRadius());
 	local_player->setPosition(local_player_position_x, local_player_position_y);
 
 	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE, stats1);
@@ -413,7 +354,7 @@ void GameManager::players_initialization()
 
 void GameManager::pack_player(sf::Packet& packet_to_send)
 {
-	
+
 	packet_to_send << local_player->getPosition().x << local_player->getPosition().y << local_player->getShape().getRotation();
 }
 
@@ -456,10 +397,10 @@ void GameManager::unpack_ball_objects(sf::Packet & recived_packet)
 	for (int i = 0; i < recived_balls_size; i++)
 	{
 		float	start_position_x,
-				start_position_y,
-				speed,
-				radius,
-				rotation;
+			start_position_y,
+			speed,
+			radius,
+			rotation;
 		int		element;
 		recived_packet >> start_position_x >> start_position_y >> rotation >> speed >> radius >> element;
 		sf::Vector2f fixed_ball_position;
