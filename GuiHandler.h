@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 #include <TGUI\TGUI.hpp>
 #include "NetworkHandler.h"
 #include <iostream>
@@ -52,6 +53,7 @@ private:
 	NetworkHandler* network_handler;
 	GameManager* gm;
 	Tree* tree;
+	sf::Music music;
 
 	std::string current_logged_account;
 	std::string current_picked_character;

@@ -207,6 +207,9 @@ void GuiHandler::main_menu()
 
 void GuiHandler::login()
 {
+	music.openFromFile("Sounds/Music/Time Has Come.WAV");
+	music.play();
+	music.setLoop(true);
 	//Background
 	tgui::Picture::Ptr loginBackground = tgui::Picture::create("Graphics/Screens/Login_bg.png");
 	loginBackground->setSize(800, 600);
@@ -325,6 +328,9 @@ void GuiHandler::end_game(bool current_player_won)
 
 void GuiHandler::game()
 {
+	music.openFromFile("Sounds/Music/I'm The Power.WAV");
+	music.play();
+	music.setLoop(true);
 	gm->run();
 	this->change_active_gui(GuiHandler::ENDGAME);
 	gui->removeAllWidgets();
