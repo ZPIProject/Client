@@ -152,13 +152,18 @@ void GameManager::logic_handler()
 		directionY = -1 * directionY;
 	}
 
-	if (local_player->getPosition().x + directionX >= PLAYER_SIZE / 2 &&
-		local_player->getPosition().x + directionX <= WINDOW_WIDTH - PLAYER_SIZE / 2 &&
-		local_player->getPosition().y + directionY <= WINDOW_HEIGHT - PLAYER_SIZE / 2 - 1 &&
-		local_player->getPosition().y + directionY >= WINDOW_HEIGHT / 2 + SEPARATOR_HEIGHT / 2 + PLAYER_SIZE / 2 + 2)
-		if (std::find(vector.begin(), vector.end(), 2) != vector.end());
-		else local_player->move(directionX, directionY);
+	if (std::find(vector.begin(), vector.end(), 2) != vector.end());
+	else {
+		if (local_player->getPosition().x + directionX >= PLAYER_SIZE / 2 &&
+			local_player->getPosition().x + directionX <= WINDOW_WIDTH - PLAYER_SIZE / 2);
+		else directionX = 0;
+		if (local_player->getPosition().y + directionY <= WINDOW_HEIGHT - PLAYER_SIZE / 2 - 1 &&
+			local_player->getPosition().y + directionY >= WINDOW_HEIGHT / 2 + SEPARATOR_HEIGHT / 2 + PLAYER_SIZE / 2 + 2);
+		else directionY = 0;
+		local_player->move(directionX, directionY);
 		local_shield.move(local_player->getPosition());
+	}
+
 		managePattern();
 
 		balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());

@@ -49,6 +49,7 @@ private:
 	tgui::Gui *gui;
 	NetworkHandler* network_handler;
 	GameManager* gm;
+	Tree* tree;
 
 	std::string current_logged_account;
 	std::string current_picked_character;
