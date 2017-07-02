@@ -272,19 +272,20 @@ void GameManager::cast_spell()
 
 void GameManager::setActiveSpellData(double value)
 {
-	if (value > 0) {
-		if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8) {
-			active_spell = (int)value;
-			draw_precision_spell = fmod(value, 1);
+	if (fmod(value, 1) >= 70) {
+		if (value > 0) {
+			if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8) {
+				active_spell = (int)value;
+				draw_precision_spell = fmod(value, 1);
+			}
+			else {
+				active_element = (int)value;
+				draw_precision_element = fmod(value, 1);
+			}
+			std::cout << draw_precision_spell << " " << draw_precision_element << std::endl;
+			std::cout << active_spell << " " << active_element << std::endl;
 		}
-		else {
-			active_element = (int)value;
-			draw_precision_element = fmod(value, 1);
-		}
-		std::cout << draw_precision_spell << " " << draw_precision_element << std::endl;
-		std::cout << active_spell << " " << active_element << std::endl;
 	}
-
 }
 
 GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
