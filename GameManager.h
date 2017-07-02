@@ -57,6 +57,8 @@ class GameManager
 	std::vector<Trap> trap_vector;
 	std::vector<Trap> traps_to_send;
 
+	std::vector<int> boughtSpells;
+
 	sf::Clock ball_cooldown;
 	sf::Clock trap_cooldown;
 	
@@ -108,6 +110,7 @@ public:
 	sf::Packet pack_maxHP();
 	int unpack_maxHP(sf::Packet recived_packet);
 
+	void setBoughtSpells() { boughtSpells = tree->getBoughtSpells(); }
 	void setTree(Tree* tree) { this->tree = tree; }
 	void setEnemyStats(int maxHP) { stats1 = new Player_stats(maxHP, maxHP, 100, 100, 10, 100, 100, 100, 100, "Valium2"); }
 	bool get_player_win_status() { return player_won; }

@@ -285,18 +285,51 @@ void GameManager::setActiveSpellData(double value)
 	if (fmod(value, 1) >= 0.70) {
 		if (value > 0) {
 			if ((int)value == 2 || (int)value == 3 || (int)value == 7 || (int)value == 8) {
-				active_spell = (int)value;
-				draw_precision_spell = fmod(value, 1);
-
+				if ((int)value == 2);
+				else {
+					active_spell = (int)value;
+					draw_precision_spell = fmod(value, 1);
+				}
 			}
 			else {
 				active_element = (int)value;
 				draw_precision_element = fmod(value, 1);
-
 			}
 			std::cout << draw_precision_spell << " " << draw_precision_element << std::endl;
 			std::cout << active_spell << " " << active_element << std::endl;
 		}
+	}
+	if (active_element != 0 && active_spell != 0) {
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 0) != boughtSpells.end() && active_element == 5 && active_spell == 7);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 7) != boughtSpells.end() && active_element == 5 && active_spell == 8);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 14) != boughtSpells.end() && active_element == 5 && active_spell == 3);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 15) != boughtSpells.end() && active_element == 1 && active_spell == 7);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 23) != boughtSpells.end() && active_element == 1 && active_spell == 8);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 26) != boughtSpells.end() && active_element == 1 && active_spell == 3);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 27) != boughtSpells.end() && active_element == 6 && active_spell == 7);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 35) != boughtSpells.end() && active_element == 6 && active_spell == 8);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 36) != boughtSpells.end() && active_element == 6 && active_spell == 3);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 37) != boughtSpells.end() && active_element == 4 && active_spell == 7);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 44) != boughtSpells.end() && active_element == 4 && active_spell == 8);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 50) != boughtSpells.end() && active_element == 4 && active_spell == 3);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 51) != boughtSpells.end() && active_element == 9 && active_spell == 7);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 60) != boughtSpells.end() && active_element == 9 && active_spell == 8);
+		else { active_element = 0; draw_precision_element = 0; }
+		if (std::find(boughtSpells.begin(), boughtSpells.end(), 62) != boughtSpells.end() && active_element == 9 && active_spell == 3);
+		else { active_element = 0; draw_precision_element = 0; }
 	}
 }
 

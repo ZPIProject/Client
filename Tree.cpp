@@ -140,144 +140,60 @@ void Tree::buySkill(int id) {
 void Tree::count_knowledge()
 {
 	int result = 0;
-	if (skills[1]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[5]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[9]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[12]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[17]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[25]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[28]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[34]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[46]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[48]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[41]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[54]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[58]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[61]->getStatus() == SOLD) {
-		result += 5;
-	}
+	if (skills[1]->getStatus() == SOLD) { result += 5;}
+	if (skills[5]->getStatus() == SOLD) { result += 5;}
+	if (skills[9]->getStatus() == SOLD) { result += 5;}
+	if (skills[12]->getStatus() == SOLD) { result += 5;}
+	if (skills[17]->getStatus() == SOLD) { result += 5;}
+	if (skills[25]->getStatus() == SOLD) { result += 5;}
+	if (skills[28]->getStatus() == SOLD) { result += 5;}
+	if (skills[34]->getStatus() == SOLD) { result += 5;}
+	if (skills[46]->getStatus() == SOLD) { result += 5;}
+	if (skills[48]->getStatus() == SOLD) { result += 5;}
+	if (skills[41]->getStatus() == SOLD) { result += 5;}
+	if (skills[54]->getStatus() == SOLD) { result += 5;}
+	if (skills[58]->getStatus() == SOLD) { result += 5;}
+	if (skills[61]->getStatus() == SOLD) { result += 5;}
 	knowledge = result;
 }
 
 void Tree::count_vitality()
 {
 	int result = 0;
-	if (skills[2]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[4]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[11]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[10]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[19]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[21]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[24]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[32]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[39]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[40]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[47]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[53]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[57]->getStatus() == SOLD) {
-		result += 5;
-	}
+	if (skills[2]->getStatus() == SOLD) { result += 5;}
+	if (skills[4]->getStatus() == SOLD) { result += 5;}
+	if (skills[11]->getStatus() == SOLD) { result += 5;}
+	if (skills[10]->getStatus() == SOLD) { result += 5;}
+	if (skills[19]->getStatus() == SOLD) { result += 5;}
+	if (skills[21]->getStatus() == SOLD) { result += 5;}
+	if (skills[24]->getStatus() == SOLD) { result += 5;}
+	if (skills[32]->getStatus() == SOLD) { result += 5;}
+	if (skills[39]->getStatus() == SOLD) { result += 5;}
+	if (skills[40]->getStatus() == SOLD) { result += 5;}
+	if (skills[47]->getStatus() == SOLD) { result += 5;}
+	if (skills[53]->getStatus() == SOLD) { result += 5;}
+	if (skills[57]->getStatus() == SOLD) { result += 5;}
 	vitality = result;
 }
 
 void Tree::count_wisdom()
 {
 	int result = 0;
-	if (skills[3]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[8]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[13]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[16]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[18]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[22]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[29]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[33]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[38]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[42]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[45]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[49]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[52]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[55]->getStatus() == SOLD) {
-		result += 5;
-	}
-	if (skills[59]->getStatus() == SOLD) {
-		result += 5;
-	}
+	if (skills[3]->getStatus() == SOLD) { result += 5;}
+	if (skills[8]->getStatus() == SOLD) { result += 5;}
+	if (skills[13]->getStatus() == SOLD) { result += 5;}
+	if (skills[16]->getStatus() == SOLD) { result += 5;}
+	if (skills[18]->getStatus() == SOLD) { result += 5;}
+	if (skills[22]->getStatus() == SOLD) { result += 5;}
+	if (skills[29]->getStatus() == SOLD) { result += 5;}
+	if (skills[33]->getStatus() == SOLD) { result += 5;}
+	if (skills[38]->getStatus() == SOLD) { result += 5;}
+	if (skills[42]->getStatus() == SOLD) { result += 5;}
+	if (skills[45]->getStatus() == SOLD) { result += 5;}
+	if (skills[49]->getStatus() == SOLD) { result += 5;}
+	if (skills[52]->getStatus() == SOLD) { result += 5;}
+	if (skills[55]->getStatus() == SOLD) { result += 5;}
+	if (skills[59]->getStatus() == SOLD) { result += 5;}
 	wisdom = result;
 }
 
@@ -316,66 +232,26 @@ int Tree::getSkillPoints()
 std::vector<int> Tree::getBoughtSpells()
 {
 	std::vector<int> result;
-	if (skills[0]->getStatus() == SOLD) {
-		result.push_back(0);
-	}
-	if (skills[6]->getStatus() == SOLD) {
-		result.push_back(6);
-	}
-	if (skills[7]->getStatus() == SOLD) {
-		result.push_back(7);
-	}
-	if (skills[14]->getStatus() == SOLD) {
-		result.push_back(14);
-	}
-	if (skills[15]->getStatus() == SOLD) {
-		result.push_back(15);
-	}
-	if (skills[20]->getStatus() == SOLD) {
-		result.push_back(20);
-	}
-	if (skills[23]->getStatus() == SOLD) {
-		result.push_back(23);
-	}
-	if (skills[26]->getStatus() == SOLD) {
-		result.push_back(26);
-	}
-	if (skills[27]->getStatus() == SOLD) {
-		result.push_back(27);
-	}
-	if (skills[31]->getStatus() == SOLD) {
-		result.push_back(31);
-	}
-	if (skills[35]->getStatus() == SOLD) {
-		result.push_back(35);
-	}
-	if (skills[36]->getStatus() == SOLD) {
-		result.push_back(36);
-	}
-	if (skills[37]->getStatus() == SOLD) {
-		result.push_back(37);
-	}
-	if (skills[43]->getStatus() == SOLD) {
-		result.push_back(43);
-	}
-	if (skills[44]->getStatus() == SOLD) {
-		result.push_back(44);
-	}
-	if (skills[50]->getStatus() == SOLD) {
-		result.push_back(50);
-	}
-	if (skills[51]->getStatus() == SOLD) {
-		result.push_back(51);
-	}
-	if (skills[56]->getStatus() == SOLD) {
-		result.push_back(56);
-	}
-	if (skills[60]->getStatus() == SOLD) {
-		result.push_back(60);
-	}
-	if (skills[62]->getStatus() == SOLD) {
-		result.push_back(62);
-	}
+	if (skills[0]->getStatus() == SOLD) { result.push_back(0); }
+	//if (skills[6]->getStatus() == SOLD) {result.push_back(6);}
+	if (skills[7]->getStatus() == SOLD) { result.push_back(7); }
+	if (skills[14]->getStatus() == SOLD) { result.push_back(14); }
+	if (skills[15]->getStatus() == SOLD) { result.push_back(15); }
+	//if (skills[20]->getStatus() == SOLD) { result.push_back(20);}
+	if (skills[23]->getStatus() == SOLD) { result.push_back(23); }
+	if (skills[26]->getStatus() == SOLD) { result.push_back(26); }
+	if (skills[27]->getStatus() == SOLD) { result.push_back(27); }
+	//if (skills[31]->getStatus() == SOLD) { result.push_back(31); }
+	if (skills[35]->getStatus() == SOLD) { result.push_back(35); }
+	if (skills[36]->getStatus() == SOLD) { result.push_back(36); }
+	if (skills[37]->getStatus() == SOLD) { result.push_back(37); }
+	//if (skills[43]->getStatus() == SOLD) { result.push_back(43); }
+	if (skills[44]->getStatus() == SOLD) { result.push_back(44); }
+	if (skills[50]->getStatus() == SOLD) { result.push_back(50); }
+	if (skills[51]->getStatus() == SOLD) { result.push_back(51); }
+	//if (skills[56]->getStatus() == SOLD) { result.push_back(56); }
+	if (skills[60]->getStatus() == SOLD) { result.push_back(60); }
+	if (skills[62]->getStatus() == SOLD) { result.push_back(62); }
 	return result;
 }
 
@@ -384,4 +260,3 @@ sf::Packet Tree::buyRequest(std::string player, int idskilla) {
 	result << 8 << player << idskilla;
 	return result;
 }
-

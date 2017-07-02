@@ -334,6 +334,7 @@ void GuiHandler::game()
 	//std::cout << enemy_max_hp << std::endl;
 	gm->setEnemyStats(enemy_max_hp);
 	gm->players_initialization();
+	gm->setBoughtSpells();
 	gm->run();
 	this->change_active_gui(GuiHandler::ENDGAME);
 	gui->removeAllWidgets();
