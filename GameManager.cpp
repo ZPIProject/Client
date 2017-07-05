@@ -4,7 +4,6 @@
 #include "Spell_Headers\Ball.h"
 #include "Collider_Headers\ColidableObject.h"
 #include <iomanip>
-#include <thread>
 #include <cmath>
 #include <cstdio>
 #include <limits>
@@ -16,9 +15,8 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window->clear(sf::Color(50, 120, 50));
-
-	main_window->draw(separator->getShape());
+	main_window->clear();
+	main_window->draw(background);
 
 	main_window->draw(local_player->getShape());
 	main_window->draw(non_local_player->getShape());
@@ -81,42 +79,6 @@ void GameManager::draw()
 	if (non_local_shield.getActiveStatus())
 		main_window->draw(non_local_shield.getShape());
 	main_window->draw(Pattern.getArray());
-	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&non_local_player->getCollider()))
-	//{
-	//	sf::CircleShape point;
-	//	point.setPosition(circle->getPosition());
-	//	point.setRadius(circle->getRadius());
-	//	point.setOutlineThickness(3);
-	//	point.setOutlineColor(sf::Color::Black);
-	//	point.setFillColor(sf::Color(0, 0, 0, 0));
-	//	main_window->draw(point);
-
-	//	sf::Text player_position_and_collider_position;
-	//	player_position_and_collider_position.setString(std::to_string(non_local_player->getPosition().x) + " " + std::to_string(non_local_player->getPosition().y) + " " + std::to_string(circle->getPosition().x) + " " + std::to_string(circle->getPosition().y));
-	//	player_position_and_collider_position.setPosition(0, 300);
-	//	sf::Font font;
-	//	font.loadFromFile("arial.ttf");
-	//	player_position_and_collider_position.setFont(font);
-
-	//	main_window->draw(player_position_and_collider_position);
-	//}
-
-	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&local_player->getCollider()))
-	//{
-	//	sf::CircleShape point;
-	///*	sf::Vector2f fixed_position;
-	//	fixed_position.x = circle->getPosition().x - PLAYER_SIZE / 2;
-	//	fixed_position.y = circle->getPosition().y - PLAYER_SIZE / 2;
-	//	point.setPosition(fixed_position);*/
-	//	point.setPosition(circle->getPosition());
-	//	point.setRadius(circle->getRadius());
-	//	point.setOutlineThickness(3);
-	//	point.setFillColor(sf::Color(0, 0, 0, 0));
-	//	point.setOutlineColor(sf::Color::Black);
-	//	main_window->draw(point);
-	//}
-	
-	
 	main_window->display();
 }
 
@@ -176,14 +138,22 @@ void GameManager::logic_handler()
 
 	sf::Mouse mouse;
 	int directionX = 0, directionY = 0;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && main_window->hasFocus())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && main_window->hasFocus()) {
 		directionX = -1;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && main_window->hasFocus())
+		step_sound.play();
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && main_window->hasFocus()){
 		directionX = 1;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && main_window->hasFocus())
+	step_sound.play();
+}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && main_window->hasFocus()){
 		directionY = -1;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && main_window->hasFocus())
+	step_sound.play();
+}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && main_window->hasFocus()){
 		directionY = 1;
+	step_sound.play();
+}
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && main_window->hasFocus() ) {
 		cast_spell();
@@ -208,7 +178,6 @@ void GameManager::logic_handler()
 		local_shield.move(local_player->getPosition());
 	}
 
-	managePattern();
 
 	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
 	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
@@ -257,6 +226,7 @@ void GameManager::cast_spell()
 			if (local_player->getMana() >= 10)
 			{
 				local_player->decMana(10);
+				ball_sound.play();
 				//Ball_stats configuration
 				float damage = local_player->getPlayerStats()->get_base_dmg();
 				if (draw_precision_spell > 0.95 && draw_precision_element > 0.95) damage *= 1.5;
@@ -281,7 +251,7 @@ void GameManager::cast_spell()
 			if (local_player->getMana() >= 40)
 			{
 				local_player->decMana(40);
-
+				trap_sound.play();
 				//Trap_stats configuration
 				Element e = (Element)active_element;
 				float radius = 5;
@@ -360,6 +330,21 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window, Tr
 	network_handler = network;
 	this->tree = &tree;
 
+	background_tex = sf::Texture();
+	background_tex.loadFromFile("Graphics/Screens/Battleground1_bg.png");
+	background = sf::Sprite();
+	background.setTexture(background_tex);
+
+	sounds = SoundManager();
+
+
+	ball.loadFromFile("Sounds/Ballsend.wav");
+	ball_sound.setBuffer(ball);
+	trap.loadFromFile("Sounds/Trap_set.wav");
+	trap_sound.setBuffer(trap);
+	step.loadFromFile("Sounds/Steps.wav");
+	step_sound.setBuffer(step);
+
 	local_shield.setActiveStatus(false);
 	non_local_shield.setActiveStatus(false);
 }
@@ -375,6 +360,8 @@ void GameManager::run()
 	{
 
 		game_in_progress();
+		managePattern();
+
 	}
 }
 void GameManager::game_in_progress()

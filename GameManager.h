@@ -16,8 +16,12 @@
 #include "Status_Hud.h"
 #include "Current_Spell_Hud.h"
 
+#include "SoundManager.h"
+
 class GameManager
 {
+	SoundManager sounds;
+
 	bool want_to_run_with_connection_to_server = true;
 	bool is_pattern_drawn;
 	bool exited_from_game = false;
@@ -103,6 +107,22 @@ class GameManager
 	void pack_all_and_send();
 	void recive_and_unpack_all();
 	void check_if_player_has_left();
+
+
+	sf::SoundBuffer ball;
+	sf::SoundBuffer trap;
+	sf::SoundBuffer step;
+	sf::Sound ball_sound;
+	sf::Sound trap_sound;
+	sf::Sound step_sound;
+
+	sf::Texture background_tex;
+	sf::Sprite background;
+
+
+
+
+
 public:
 	GameManager(NetworkHandler* network, sf::RenderWindow& window, Tree& tree);
 	~GameManager();
