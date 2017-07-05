@@ -11,7 +11,7 @@ Player_Hud::Player_Hud(Player_stats* local_stats, Player_stats* non_local_stats)
 
 	opponentsHP.setString("HP:" + Convert((non_local_stats->get_current_health()/non_local_stats->get_MAX_health())*100) + "%");
 	opponentsHP.setCharacterSize(20);
-	opponentsHP.setColor(sf::Color::Black);
+	opponentsHP.setFillColor(sf::Color::Black);
 	opponentsHP.setStyle(sf::Text::Bold);
 	opponentsHP.setPosition(sf::Vector2f(5, 5));
 	opponentsHP.setFont(font);
@@ -34,14 +34,14 @@ Player_Hud::Player_Hud(Player_stats* local_stats, Player_stats* non_local_stats)
 
 	HP_value.setString(Convert(local_stats->get_current_health()) + "/" + Convert(local_stats->get_MAX_health()) + ":HP");
 	HP_value.setCharacterSize(20);
-	HP_value.setColor(sf::Color::Black);
+	HP_value.setFillColor(sf::Color::Black);
 	HP_value.setStyle(sf::Text::Bold);
 	HP_value.setPosition(sf::Vector2f(665, 550));
 	HP_value.setFont(font);
 
 	MP_value.setString(Convert(local_stats->get_current_mana()) + "/" + Convert(local_stats->get_MAX_mana()) + ":MP");
 	MP_value.setCharacterSize(20);
-	MP_value.setColor(sf::Color::Black);
+	MP_value.setFillColor(sf::Color::Black);
 	MP_value.setStyle(sf::Text::Bold);
 	MP_value.setPosition(sf::Vector2f(665, 575));
 	MP_value.setFont(font);

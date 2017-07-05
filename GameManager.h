@@ -28,16 +28,16 @@ class GameManager
 	bool player_won = false;
 	bool end_game = false;
 
+
+
 	std::string current_username;
 	Pattern_management Pattern;
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
+	
 	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
 	
-	sf::Texture background_tex;
-	sf::Sprite background;
-
 	Separator* separator;
 
 	Player_Hud* hud;
@@ -54,6 +54,9 @@ class GameManager
 	Shield local_shield;
 	Shield non_local_shield;
 
+	sf::Clock local_shield_timer;
+	sf::Clock non_local_shield_timer; // zmieniæ na oppenent pewnie bedzie ³adniej wygl¹da³os
+
 	std::vector<Ball> balls_vector;
 	std::vector<Ball> balls_to_send;
 	std::vector<Trap> trap_vector;
@@ -66,7 +69,7 @@ class GameManager
 
 
 	NetworkHandler* network_handler;
-
+	Tree* tree;
 	CollisionHandler collision_handler;
 
 	Game_states current_game_state;
@@ -86,7 +89,7 @@ class GameManager
 	void managePattern();
 	void cast_spell();
 	void game_in_progress();
-
+	void check_win_condition();
 	void players_initialization();
 	
 	void pack_player(sf::Packet& packet_to_send);
@@ -101,7 +104,6 @@ class GameManager
 	void pack_shield_object(sf::Packet& packet_to_send);
 	void unpack_shield_object(sf::Packet& packet_to_send);
 
-
 	void pack_all_and_send();
 	void recive_and_unpack_all();
 	void check_if_player_has_left();
@@ -114,16 +116,19 @@ class GameManager
 	sf::Sound trap_sound;
 	sf::Sound step_sound;
 
+	sf::Texture background_tex;
+	sf::Sprite background;
 
 
 
 
 
 public:
-	GameManager(NetworkHandler* network, sf::RenderWindow& window);
+	GameManager(NetworkHandler* network, sf::RenderWindow& window, Tree& tree);
 	~GameManager();
 
 	bool get_player_win_status() { return player_won; }
+	void reset_game_has_ended() { end_game = false; }
 	void run();
 };
 

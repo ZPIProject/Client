@@ -17,9 +17,9 @@ GuiHandler::GuiHandler(sf::RenderWindow & win)
 	active_gui = CurrentActiveGUI::LOGIN;
 	login();
 	did_active_gui_changed = false;
-	gm = new GameManager(network_handler, *window);
 	pressed.loadFromFile("Sounds/Button_Select.wav");
 	pressed_sound.setBuffer(pressed);
+	gm = new GameManager(network_handler, *window, *tree);
 }
 
 void GuiHandler::handle_event(sf::Event & event)
@@ -73,6 +73,10 @@ void GuiHandler::character_selection()
 	characterPictureTemp->setSize(160, 160);
 	characterPictureTemp->setPosition(320, 220);
 	gui->add(characterPictureTemp);
+
+	/*labelPictureTemp->setSize(160, 160);
+	labelPictureTemp->setPosition(320, 220);
+	gui->add(labelPictureTemp);*/
 
 	labelCharacterName->setPosition(340, 180);
 	labelCharacterName->setTextColor("white");
@@ -343,6 +347,7 @@ void GuiHandler::game()
 	music.play();
 	music.setLoop(true);
 	gm->run();
+	gm->reset_game_has_ended();
 	this->change_active_gui(GuiHandler::ENDGAME);
 	gui->removeAllWidgets();
 	end_game(gm->get_player_win_status());
