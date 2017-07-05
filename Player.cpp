@@ -4,11 +4,13 @@
 #include "Spell_Headers\Trap.h"
 
 
-Player::Player(sf::Color players_color, float player_size, Player_stats* stts) : ColidableObject(new CircleCollider(player_size/2)),stats(stts)
+Player::Player(sf::Color players_color, float player_size, std::string path, Player_stats* stts) : ColidableObject(new CircleCollider(player_size/2)),stats(stts)
 {
+	texture.loadFromFile(path);
+	player_shape.setTexture(texture);
 	player_shape.setPosition(sf::Vector2f(0, 0));
-	player_shape.setFillColor(players_color);
-	player_shape.setRadius(player_size/2);
+	//player_shape.setFillColor(players_color);
+	//player_shape.setRadius(player_size/2);
 	player_shape.setOrigin(sf::Vector2f(player_size /2, player_size /2));
 	stats = stts;
 	stats->set_speed(3); // daæ to jako parametr i ewentualnie daæ metode setColor
@@ -120,7 +122,7 @@ sf::Vector2f Player::getPosition()
 	return player_shape.getPosition();
 }
 
-sf::CircleShape Player::getShape()
+sf::Sprite Player::getShape()
 {
 	return player_shape;
 }
