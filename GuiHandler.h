@@ -6,6 +6,7 @@
 #include <iostream>
 #include "GameManager.h"
 #include "Tree.h"
+#include <SFML\Audio.hpp>
 class GuiHandler
 {
 public:
@@ -66,6 +67,7 @@ private:
 	int get_character_level();
 	int get_character_exp();
 	void send_lvl_up_to_DB();
-
+	sf::SoundBuffer pressed;
+	sf::Sound pressed_sound;
 
 };

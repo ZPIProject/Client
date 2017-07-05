@@ -4,7 +4,6 @@
 #include "Spell_Headers\Ball.h"
 #include "Collider_Headers\ColidableObject.h"
 #include <iomanip>
-#include <thread>
 #include <cmath>
 #include <cstdio>
 #include <limits>
@@ -142,14 +141,22 @@ void GameManager::logic_handler()
 
 	sf::Mouse mouse;
 	int directionX = 0, directionY = 0;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && main_window->hasFocus())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && main_window->hasFocus()) {
 		directionX = -1;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && main_window->hasFocus())
+		step_sound.play();
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && main_window->hasFocus()){
 		directionX = 1;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && main_window->hasFocus())
+	step_sound.play();
+}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && main_window->hasFocus()){
 		directionY = -1;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && main_window->hasFocus())
+	step_sound.play();
+}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && main_window->hasFocus()){
 		directionY = 1;
+	step_sound.play();
+}
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && main_window->hasFocus() ) {
 		cast_spell();
@@ -174,7 +181,6 @@ void GameManager::logic_handler()
 		local_shield.move(local_player->getPosition());
 	}
 
-	managePattern();
 
 	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
 	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
@@ -217,6 +223,7 @@ void GameManager::cast_spell()
 			if (local_player->getMana() >= 10)
 			{
 				local_player->decMana(10);
+				ball_sound.play();
 				//Ball_stats configuration
 				float damage = local_player->getPlayerStats()->get_base_dmg();
 				if (draw_precision_spell > 0.95 && draw_precision_element > 0.95) damage *= 1.5;
@@ -241,7 +248,7 @@ void GameManager::cast_spell()
 			if (local_player->getMana() >= 40)
 			{
 				local_player->decMana(40);
-
+				trap_sound.play();
 				//Trap_stats configuration
 				Element e = (Element)active_element;
 				float radius = 5;
@@ -321,6 +328,17 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	background_tex.loadFromFile("Graphics/Screens/Battleground1_bg.png");
 	background = sf::Sprite();
 	background.setTexture(background_tex);
+
+	sounds = SoundManager();
+
+
+	ball.loadFromFile("Sounds/Ballsend.wav");
+	ball_sound.setBuffer(ball);
+	trap.loadFromFile("Sounds/Trap_set.wav");
+	trap_sound.setBuffer(trap);
+	step.loadFromFile("Sounds/Steps.wav");
+	step_sound.setBuffer(step);
+
 }
 GameManager::~GameManager()
 {
@@ -334,6 +352,8 @@ void GameManager::run()
 	{
 
 		game_in_progress();
+		managePattern();
+
 	}
 }
 void GameManager::game_in_progress()

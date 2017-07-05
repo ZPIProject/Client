@@ -18,6 +18,8 @@ GuiHandler::GuiHandler(sf::RenderWindow & win)
 	login();
 	did_active_gui_changed = false;
 	gm = new GameManager(network_handler, *window);
+	pressed.loadFromFile("Sounds/Button_Select.wav");
+	pressed_sound.setBuffer(pressed);
 }
 
 void GuiHandler::handle_event(sf::Event & event)
@@ -59,15 +61,11 @@ void GuiHandler::character_selection()
 	tgui::Button::Ptr button1 = tgui::Button::create("Logout");
 	tgui::Button::Ptr button2 = tgui::Button::create("<");
 	tgui::Button::Ptr button3 = tgui::Button::create(">");
-
-	//tgui::Picture::Ptr characterPicture = tgui::Picture::create("../tempChar.png");
-	//tgui::Label::Ptr labelPictureTemp;
 	tgui::Picture::Ptr characterPictureTemp;
 	tgui::Label::Ptr labelCharacterName;
 	if (vector_of_images.size() > 0 && character_list.size() > 0)
 	{
 		characterPictureTemp = tgui::Picture::create(vector_of_images[0].c_str());
-		//labelPictureTemp = tgui::Label::create(vector_of_images[0]);
 		labelCharacterName = tgui::Label::create(character_list[0]);
 		set_current_character(character_list[0]);
 	}
@@ -159,6 +157,7 @@ void GuiHandler::main_menu()
 		std::cout << "-->playPressed() " << std::endl;
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::GAME);
+		pressed_sound.play();
 	});
 	gui->add(button0);
 
@@ -168,6 +167,8 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::PLAYERSTATISTIC);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button1);
 
@@ -177,6 +178,8 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::TUTORIAL);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button2);
 
@@ -186,6 +189,8 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::CHARACTERSELECTION);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button3);
 
@@ -196,12 +201,15 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::LOGIN);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button4);
 
 	button5->setSize(300, 40);
 	button5->setPosition(250, 530);
-	button5->connect("pressed", [&]() { window->close(); });
+	button5->connect("pressed", [&]() { window->close();pressed_sound.play();
+	});
 	gui->add(button5);
 }
 
@@ -242,6 +250,7 @@ void GuiHandler::login()
 	button0->setPosition(550, 520);
 	button0->connect("pressed", [=]()
 	{
+		pressed_sound.play();
 		NetworkHandler* nh = this->get_network_handler();
 		nh->connect(editbox0->getText().toAnsiString());
 
@@ -294,6 +303,7 @@ void GuiHandler::tutorial()
 	button0->setSize(300, 40);
 	button0->setPosition(250, 550);
 	button0->connect("pressed", [=]() {
+		pressed_sound.play();
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::MAINMENU);
 		std::cout << "change status " << this->get_status() << " DONE\n";
@@ -318,6 +328,7 @@ void GuiHandler::end_game(bool current_player_won)
 	main_menu_button->setSize(100, 30);
 	main_menu_button->setPosition(350, 350);
 	main_menu_button->connect("pressed", [=]() {
+		pressed_sound.play();
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::MAINMENU);
 	}
@@ -518,6 +529,7 @@ void GuiHandler::statistics()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::MAINMENU);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
 	});
 	gui->add(button2);
 
