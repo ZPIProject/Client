@@ -16,9 +16,10 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window->clear(sf::Color(50, 120, 50));
+	main_window->clear();
 
-	main_window->draw(separator->getShape());
+	main_window->draw(background);
+	//main_window->draw(separator->getShape());
 
 	main_window->draw(local_player->getShape());
 	main_window->draw(non_local_player->getShape());
@@ -80,42 +81,7 @@ void GameManager::draw()
 		main_window->draw(local_shield.getShape());
 	if (non_local_shield.getActiveStatus())
 		main_window->draw(non_local_shield.getShape());
-	main_window->draw(Pattern.getArray());
-	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&non_local_player->getCollider()))
-	//{
-	//	sf::CircleShape point;
-	//	point.setPosition(circle->getPosition());
-	//	point.setRadius(circle->getRadius());
-	//	point.setOutlineThickness(3);
-	//	point.setOutlineColor(sf::Color::Black);
-	//	point.setFillColor(sf::Color(0, 0, 0, 0));
-	//	main_window->draw(point);
-
-	//	sf::Text player_position_and_collider_position;
-	//	player_position_and_collider_position.setString(std::to_string(non_local_player->getPosition().x) + " " + std::to_string(non_local_player->getPosition().y) + " " + std::to_string(circle->getPosition().x) + " " + std::to_string(circle->getPosition().y));
-	//	player_position_and_collider_position.setPosition(0, 300);
-	//	sf::Font font;
-	//	font.loadFromFile("arial.ttf");
-	//	player_position_and_collider_position.setFont(font);
-
-	//	main_window->draw(player_position_and_collider_position);
-	//}
-
-	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&local_player->getCollider()))
-	//{
-	//	sf::CircleShape point;
-	///*	sf::Vector2f fixed_position;
-	//	fixed_position.x = circle->getPosition().x - PLAYER_SIZE / 2;
-	//	fixed_position.y = circle->getPosition().y - PLAYER_SIZE / 2;
-	//	point.setPosition(fixed_position);*/
-	//	point.setPosition(circle->getPosition());
-	//	point.setRadius(circle->getRadius());
-	//	point.setOutlineThickness(3);
-	//	point.setFillColor(sf::Color(0, 0, 0, 0));
-	//	point.setOutlineColor(sf::Color::Black);
-	//	main_window->draw(point);
-	//}
-	
+	main_window->draw(Pattern.getArray());	
 	
 	main_window->display();
 }
@@ -362,6 +328,12 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window, Tr
 
 	local_shield.setActiveStatus(false);
 	non_local_shield.setActiveStatus(false);
+
+	background_tex = sf::Texture();
+	background_tex.loadFromFile("Graphics/Screens/Battleground1_bg.png");
+	background = sf::Sprite();
+	background.setTexture(background_tex);
+
 }
 GameManager::~GameManager()
 {
@@ -410,7 +382,6 @@ void GameManager::check_win_condition()
 		end_game = true;
 	}
 }
-
 void GameManager::players_initialization()
 {
 
@@ -426,7 +397,7 @@ void GameManager::players_initialization()
 	sf::Vector2f position(local_player_position_x, local_player_position_y);
 	local_player->setPosition(position);
 
-	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE,"Graphics/Character/enemy.png", stats1);
+	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE, "Graphics/Character/enemy.png", stats1);
 	non_local_player->setPosition(400, 160);
 
 
@@ -448,8 +419,8 @@ void GameManager::unpack_player(sf::Packet& recived_packet)
 	recived_packet >> packet_type >> recived_position_x >> recived_position_y >> recived_rotation;
 	//std::cout << recived_position_x << " " << recived_position_y << " " << recived_rotation;
 	sf::Vector2f playerPosition;
-	playerPosition.x = WINDOW_WIDTH - PLAYER_SIZE/2 - recived_position_x;
-	playerPosition.y = WINDOW_HEIGHT - PLAYER_SIZE/2 - recived_position_y;
+	playerPosition.x = WINDOW_WIDTH - PLAYER_SIZE / 2 - recived_position_x;
+	playerPosition.y = WINDOW_HEIGHT - PLAYER_SIZE / 2 - recived_position_y;
 	non_local_player->setPosition(playerPosition);
 	non_local_player->setRotation(recived_rotation);
 
@@ -559,6 +530,25 @@ void GameManager::unpack_shield_object(sf::Packet & recived_packet)
 		non_local_shield_timer.restart();
 	}
 
+}
+
+void GameManager::stats_to_send(int know, int wis, int vit)
+{
+	sf::Packet stats;
+	stats << 1 << know << wis << vit;
+	network_handler->send_packet(stats);
+}
+
+std::vector<int> GameManager::stats_recived()
+{
+	std::vector<int> stats;
+	sf::Packet recived = network_handler->recive_packet();
+	int know, wis, vit, type;
+	recived >> type >> know >> wis >> vit;
+	stats.push_back(know);
+	stats.push_back(wis);
+	stats.push_back(vit);
+	return stats;
 }
 
 void GameManager::pack_all_and_send()
