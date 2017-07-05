@@ -73,7 +73,6 @@ class GameManager
 
 
 	NetworkHandler* network_handler;
-	Tree* tree;
 	CollisionHandler collision_handler;
 
 	Game_states current_game_state;
@@ -94,7 +93,6 @@ class GameManager
 	void cast_spell();
 	void game_in_progress();
 	void check_win_condition();
-	void players_initialization();
 	
 	void pack_player(sf::Packet& packet_to_send);
 	void unpack_player(sf::Packet& recived_packet);
