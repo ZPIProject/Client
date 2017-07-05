@@ -59,11 +59,5 @@ private:
 	bool did_active_gui_changed;
 
 	void on_character_select_button();
-	bool check_if_lvlup();
-	bool add_exp(int ammount);
-	int get_character_level();
-	int get_character_exp();
-	void send_lvl_up_to_DB();
-
 
 };
