@@ -16,10 +16,9 @@ void GameManager::change_game_state(Game_states state)
 
 void GameManager::draw()
 {
-	main_window->clear();
+	main_window->clear(sf::Color(50, 120, 50));
 
-	main_window->draw(background);
-	//main_window->draw(separator->getShape());
+	main_window->draw(separator->getShape());
 
 	main_window->draw(local_player->getShape());
 	main_window->draw(non_local_player->getShape());
@@ -77,12 +76,47 @@ void GameManager::draw()
 		main_window->draw(trap_vector[i].getShape());
 	}
 
-	if (!local_shield.has_ended())
+	if (local_shield.getActiveStatus())
 		main_window->draw(local_shield.getShape());
-	if (!non_local_shield.has_ended())
+	if (non_local_shield.getActiveStatus())
 		main_window->draw(non_local_shield.getShape());
-
 	main_window->draw(Pattern.getArray());
+	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&non_local_player->getCollider()))
+	//{
+	//	sf::CircleShape point;
+	//	point.setPosition(circle->getPosition());
+	//	point.setRadius(circle->getRadius());
+	//	point.setOutlineThickness(3);
+	//	point.setOutlineColor(sf::Color::Black);
+	//	point.setFillColor(sf::Color(0, 0, 0, 0));
+	//	main_window->draw(point);
+
+	//	sf::Text player_position_and_collider_position;
+	//	player_position_and_collider_position.setString(std::to_string(non_local_player->getPosition().x) + " " + std::to_string(non_local_player->getPosition().y) + " " + std::to_string(circle->getPosition().x) + " " + std::to_string(circle->getPosition().y));
+	//	player_position_and_collider_position.setPosition(0, 300);
+	//	sf::Font font;
+	//	font.loadFromFile("arial.ttf");
+	//	player_position_and_collider_position.setFont(font);
+
+	//	main_window->draw(player_position_and_collider_position);
+	//}
+
+	//if (CircleCollider* circle = dynamic_cast<CircleCollider*>(&local_player->getCollider()))
+	//{
+	//	sf::CircleShape point;
+	///*	sf::Vector2f fixed_position;
+	//	fixed_position.x = circle->getPosition().x - PLAYER_SIZE / 2;
+	//	fixed_position.y = circle->getPosition().y - PLAYER_SIZE / 2;
+	//	point.setPosition(fixed_position);*/
+	//	point.setPosition(circle->getPosition());
+	//	point.setRadius(circle->getRadius());
+	//	point.setOutlineThickness(3);
+	//	point.setFillColor(sf::Color(0, 0, 0, 0));
+	//	point.setOutlineColor(sf::Color::Black);
+	//	main_window->draw(point);
+	//}
+	
+	
 	main_window->display();
 }
 
@@ -178,26 +212,32 @@ void GameManager::logic_handler()
 
 	balls_vector.erase(std::remove_if(balls_vector.begin(), balls_vector.end(), [](Ball b) { return !b.getActiveStatus(); }), balls_vector.end());
 	trap_vector.erase(std::remove_if(trap_vector.begin(), trap_vector.end(), [](Trap t) { return t.has_ended(); }), trap_vector.end());
-
-	//collision_handler.clear();
-	/*for (int i = 0; i < balls_vector.size(); i++)
+	if (local_shield_timer.getElapsedTime().asSeconds() > 15.0f)
+	{
+		local_shield.deactivate();
+	}
+	if (non_local_shield_timer.getElapsedTime().asSeconds() > 15.0f)
+	{
+		non_local_shield.deactivate();
+	}
+	if (non_local_shield.getActiveStatus())
+	{
+		sf::Vector2f pos = non_local_player->getPosition();
+		non_local_shield.setPosition(pos.x, pos.y);
+	}
+	collision_handler.clear();
+	for (int i = 0; i < balls_vector.size(); i++)
 		collision_handler.add_object(balls_vector[i]);
 	for (int i = 0; i < trap_vector.size(); i++)
 		collision_handler.add_object(trap_vector[i]);
 
 	collision_handler.add_object(*non_local_player);
-	//collision_handler.add_object(*local_player);
-
-	if (!local_shield.has_ended())
-		collision_handler.add_object(local_shield);
-
-	if (!non_local_shield.has_ended())
-		collision_handler.add_object(non_local_shield);
+	collision_handler.add_object(*local_player);
 
 	collision_handler.check_objects_which_colide();
 
 	if (std::find(vector.begin(), vector.end(), 5) != vector.end()) local_player->getPlayerStats()->set_speed(3);
-	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);*/
+	if (std::find(vector.begin(), vector.end(), 1) != vector.end()) local_player->getPlayerStats()->set_base_dmg(base_dmg);
 }
 
 void GameManager::managePattern()
@@ -258,7 +298,7 @@ void GameManager::cast_spell()
 				trap_cooldown.restart();
 			}
 		}
-		if (active_spell == 3 && !local_shield.has_ended())
+		if (active_spell == 3 && !local_shield.getActiveStatus())
 		{
 			if (local_player->getMana() >= 20)
 			{
@@ -272,6 +312,8 @@ void GameManager::cast_spell()
 				else if (draw_precision_spell < 0.70 && draw_precision_element > 0.70) duration *= 0.8;
 
 				local_shield = Shield(local_player->getPosition(), Shield_stats(e, duration, radius));
+				local_shield.setActiveStatus(true);
+				local_shield_timer.restart();
 			}
 		}
 		active_element = 0;
@@ -300,7 +342,7 @@ void GameManager::setActiveSpellData(double value)
 	}
 }
 
-GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
+GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window, Tree& tree)
 {
 	this->main_window = &window;
 	//Do rysowania znaków
@@ -316,11 +358,10 @@ GameManager::GameManager(NetworkHandler * network, sf::RenderWindow & window)
 	//want_to_run_with_connection_to_server = true;
 	//inicjalizacja obs³ugi sieci
 	network_handler = network;
+	this->tree = &tree;
 
-	background_tex = sf::Texture();
-	background_tex.loadFromFile("Graphics/Screens/Battleground1_bg.png");
-	background = sf::Sprite();
-	background.setTexture(background_tex);
+	local_shield.setActiveStatus(false);
+	non_local_shield.setActiveStatus(false);
 }
 GameManager::~GameManager()
 {
@@ -352,23 +393,40 @@ void GameManager::game_in_progress()
 	}
 	
 	check_if_player_has_left();
+	check_win_condition();
 	draw();
+}
+
+void GameManager::check_win_condition()
+{
+	if (local_player->getPlayerStats()->get_current_health() < 0)
+	{
+		player_won = false;
+		end_game = true;
+	}
+	if (non_local_player->getPlayerStats()->get_current_health() < 0)
+	{
+		player_won = true;
+		end_game = true;
+	}
 }
 
 void GameManager::players_initialization()
 {
-	stats = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium1");
+
+	stats = new Player_stats(100 , 100, 100, 100, 10, 100, 100, 100, 100, "Valium1");
 	stats1 = new Player_stats(100, 100, 100, 100, 10, 100, 100, 100, 100, "Valium2");
-	local_player = new Player(sf::Color::Red, PLAYER_SIZE, stats);
+	local_player = new Player(sf::Color::Red, PLAYER_SIZE, "Graphics/Character/player.png", stats);
 	hud = new Player_Hud(stats, stats1);
 	local_status_hud = new Status_Hud();
 	non_local_status_hud = new Status_Hud();
 	current_spell_hud = new Current_Spell_Hud();
 	int local_player_position_x = (WINDOW_WIDTH / 2);
-	int local_player_position_y = (WINDOW_HEIGHT - 2 * local_player->getShape().getRadius());
-	local_player->setPosition(local_player_position_x, local_player_position_y);
+	int local_player_position_y = (WINDOW_HEIGHT - PLAYER_SIZE);
+	sf::Vector2f position(local_player_position_x, local_player_position_y);
+	local_player->setPosition(position);
 
-	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE, stats1);
+	non_local_player = new Player(sf::Color::Blue, PLAYER_SIZE,"Graphics/Character/enemy.png", stats1);
 	non_local_player->setPosition(400, 160);
 
 
@@ -390,8 +448,8 @@ void GameManager::unpack_player(sf::Packet& recived_packet)
 	recived_packet >> packet_type >> recived_position_x >> recived_position_y >> recived_rotation;
 	//std::cout << recived_position_x << " " << recived_position_y << " " << recived_rotation;
 	sf::Vector2f playerPosition;
-	playerPosition.x = WINDOW_WIDTH - non_local_player->getShape().getRadius() / 2 - recived_position_x;
-	playerPosition.y = WINDOW_HEIGHT - non_local_player->getShape().getRadius() / 2 - recived_position_y;
+	playerPosition.x = WINDOW_WIDTH - PLAYER_SIZE/2 - recived_position_x;
+	playerPosition.y = WINDOW_HEIGHT - PLAYER_SIZE/2 - recived_position_y;
 	non_local_player->setPosition(playerPosition);
 	non_local_player->setRotation(recived_rotation);
 
@@ -448,35 +506,58 @@ void GameManager::pack_trap_objects(sf::Packet & packet_to_send)
 	packet_to_send << traps_to_send_size;
 	for (int i = 0; i < traps_to_send_size; i++)
 	{
+		float trap_position_x = traps_to_send[i].getPosition().x;
+		float trap_position_y = traps_to_send[i].getPosition().y;
+		int trap_element = (int)traps_to_send[i].getTrapStats().get_element();
 
+		packet_to_send << trap_position_x << trap_position_y << trap_element;
 	}
+	traps_to_send.clear();
 }
 
 void GameManager::unpack_trap_objects(sf::Packet & recived_packet)
 {
+	int recive_traps_size;
+	recived_packet >> recive_traps_size;
+
+	for (int i = 0; i < recive_traps_size; i++)
+	{
+		float trap_position_x;
+		float trap_position_y;
+		int trap_element;
+		float radius = 5;
+		float duration = 10.0f;
+		recived_packet >> trap_position_x >> trap_position_y >> trap_element;
+		trap_vector.push_back(Trap(sf::Vector2i(WINDOW_WIDTH - trap_position_x, WINDOW_HEIGHT - trap_position_y), Trap_stats((Element)trap_element, duration, radius)));
+	}
 }
 
 void GameManager::pack_shield_object(sf::Packet & packet_to_send)
 {
-	int element = (int)local_shield.get_statistics().get_element();
-	float radius = local_shield.get_statistics().get_radius();
-	//std::cout << "radius: " << radius << " element: " << element << "\n";
-	packet_to_send << local_shield.getPosition().x << local_shield.getPosition().y << element << radius;
+	bool active_shield = local_shield.getActiveStatus();
+	std::cout << "sending active_shield " << active_shield << "\n";
+	if (local_shield.getActiveStatus())
+	{
+		int shield_element = (int)local_shield.get_statistics().get_element();
+		packet_to_send >> active_shield >> shield_element;
+	}
 }
 
 void GameManager::unpack_shield_object(sf::Packet & recived_packet)
 {
-	float shield_position_x, shield_position_y, shield_radius;
-	int element;
-
-	recived_packet >> shield_position_x >> shield_position_y >> element >> shield_radius;
-
-	Element e = (Element)element;
-	sf::Vector2f shield_position;
-	shield_position.x = WINDOW_WIDTH - shield_position_x;
-	shield_position.y = WINDOW_HEIGHT - shield_position_y;
-	std::cout << "shield recived: " << element << " " << shield_radius << "\b";
-	non_local_shield = Shield(shield_position, Shield_stats(e, 10, SHIELD_RADIUS));
+	bool active_shield;
+	
+	recived_packet >> active_shield;
+	std::cout << "recive active_shield " << active_shield << "\n";
+	if (active_shield)
+	{
+		int shield_element;
+		recived_packet >> shield_element;
+		std::cout << "Shield recived " << shield_element << "\n";
+		non_local_shield = Shield(non_local_player->getPosition(), Shield_stats((Element)shield_element, 30.0f, SHIELD_RADIUS));
+		non_local_shield.setActiveStatus(true);
+		non_local_shield_timer.restart();
+	}
 
 }
 
@@ -486,6 +567,7 @@ void GameManager::pack_all_and_send()
 	packet_to_send << 1;
 	pack_player(packet_to_send);
 	pack_ball_objects(packet_to_send);
+	pack_trap_objects(packet_to_send);
 	//pack_shield_object(packet_to_send);
 	network_handler->send_packet(packet_to_send);
 }
@@ -496,6 +578,7 @@ void GameManager::recive_and_unpack_all()
 
 	unpack_player(recived_packet);
 	unpack_ball_objects(recived_packet);
+	unpack_trap_objects(recived_packet);
 	//unpack_shield_object(recived_packet);
 }
 
