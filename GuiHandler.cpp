@@ -17,7 +17,9 @@ GuiHandler::GuiHandler(sf::RenderWindow & win)
 	active_gui = CurrentActiveGUI::LOGIN;
 	login();
 	did_active_gui_changed = false;
-	gm = new GameManager(network_handler, *window);
+	pressed.loadFromFile("Sounds/Button_Select.wav");
+	pressed_sound.setBuffer(pressed);
+	gm = new GameManager(network_handler, *window, *tree);
 }
 
 void GuiHandler::handle_event(sf::Event & event)
@@ -59,15 +61,11 @@ void GuiHandler::character_selection()
 	tgui::Button::Ptr button1 = tgui::Button::create("Logout");
 	tgui::Button::Ptr button2 = tgui::Button::create("<");
 	tgui::Button::Ptr button3 = tgui::Button::create(">");
-
-	//tgui::Picture::Ptr characterPicture = tgui::Picture::create("../tempChar.png");
-	//tgui::Label::Ptr labelPictureTemp;
 	tgui::Picture::Ptr characterPictureTemp;
 	tgui::Label::Ptr labelCharacterName;
 	if (vector_of_images.size() > 0 && character_list.size() > 0)
 	{
 		characterPictureTemp = tgui::Picture::create(vector_of_images[0].c_str());
-		//labelPictureTemp = tgui::Label::create(vector_of_images[0]);
 		labelCharacterName = tgui::Label::create(character_list[0]);
 		set_current_character(character_list[0]);
 	}
@@ -75,6 +73,10 @@ void GuiHandler::character_selection()
 	characterPictureTemp->setSize(160, 160);
 	characterPictureTemp->setPosition(320, 220);
 	gui->add(characterPictureTemp);
+
+	/*labelPictureTemp->setSize(160, 160);
+	labelPictureTemp->setPosition(320, 220);
+	gui->add(labelPictureTemp);*/
 
 	labelCharacterName->setPosition(340, 180);
 	labelCharacterName->setTextColor("white");
@@ -161,6 +163,7 @@ void GuiHandler::main_menu()
 		std::cout << "-->playPressed() " << std::endl;
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::GAME);
+		pressed_sound.play();
 	});
 	gui->add(button0);
 
@@ -170,6 +173,8 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::PLAYERSTATISTIC);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button1);
 
@@ -179,6 +184,8 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::TUTORIAL);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button2);
 
@@ -188,6 +195,8 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::CHARACTERSELECTION);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button3);
 
@@ -198,17 +207,23 @@ void GuiHandler::main_menu()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::LOGIN);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
+
 	});
 	gui->add(button4);
 
 	button5->setSize(300, 40);
 	button5->setPosition(250, 530);
-	button5->connect("pressed", [&]() { window->close(); });
+	button5->connect("pressed", [&]() { window->close();pressed_sound.play();
+	});
 	gui->add(button5);
 }
 
 void GuiHandler::login()
 {
+	music.openFromFile("Sounds/Music/Time Has Come.WAV");
+	music.play();
+	music.setLoop(true);
 	//Background
 	tgui::Picture::Ptr loginBackground = tgui::Picture::create("Graphics/Screens/Login_bg.png");
 	loginBackground->setSize(800, 600);
@@ -241,6 +256,7 @@ void GuiHandler::login()
 	button0->setPosition(550, 520);
 	button0->connect("pressed", [=]()
 	{
+		pressed_sound.play();
 		NetworkHandler* nh = this->get_network_handler();
 		nh->connect(editbox0->getText().toAnsiString());
 
@@ -293,6 +309,7 @@ void GuiHandler::tutorial()
 	button0->setSize(300, 40);
 	button0->setPosition(250, 550);
 	button0->connect("pressed", [=]() {
+		pressed_sound.play();
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::MAINMENU);
 		std::cout << "change status " << this->get_status() << " DONE\n";
@@ -301,22 +318,23 @@ void GuiHandler::tutorial()
 }
 
 void GuiHandler::end_game(bool current_player_won)
-{
-	std::cout << current_picked_character << (current_player_won ? " won" : " lost" )<< "\n";
+{	
+	std::cout << current_picked_character << (current_player_won ? " won" : " lost") << "\n";
+	current_player_won ? add_exp(10) : add_exp(3);
+	check_if_lvlup();
 	tgui::Label::Ptr end_game_text = tgui::Label::create();
 	tgui::Button::Ptr main_menu_button = tgui::Button::create("Menu");
-
 	std::string tmp = "Game has ended";
 	end_game_text->setText(tmp);
 	end_game_text->setTextSize(20);
 	end_game_text->setPosition(325, 300);
 	gui->add(end_game_text);
 
-	
 
 	main_menu_button->setSize(100, 30);
 	main_menu_button->setPosition(350, 350);
 	main_menu_button->connect("pressed", [=]() {
+		pressed_sound.play();
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::MAINMENU);
 	}
@@ -327,6 +345,9 @@ void GuiHandler::end_game(bool current_player_won)
 
 void GuiHandler::game()
 {
+	music.openFromFile("Sounds/Music/I'm The Power.WAV");
+	music.play();
+	music.setLoop(true);
 	sf::Packet send_packet = gm->pack_maxHP();
 	network_handler->send_packet(send_packet);
 	sf::Packet recived_packet = network_handler->recive_packet();
@@ -336,6 +357,7 @@ void GuiHandler::game()
 	gm->players_initialization();
 	gm->setBoughtSpells();
 	gm->run();
+	gm->reset_game_has_ended();
 	this->change_active_gui(GuiHandler::ENDGAME);
 	gui->removeAllWidgets();
 	end_game(gm->get_player_win_status());
@@ -522,6 +544,7 @@ void GuiHandler::statistics()
 		this->set_active_gui_changed(true);
 		this->change_active_gui(GuiHandler::MAINMENU);
 		std::cout << "change status " << this->get_status() << " DONE\n";
+		pressed_sound.play();
 	});
 	gui->add(button2);
 
@@ -1739,4 +1762,54 @@ void GuiHandler::statistics()
 		buttonWaS->connect("clicked", &GuiHandler::buySkill, this, 52, current_picked_character, tree);
 		gui->add(buttonWaS);
 	}
+}
+bool GuiHandler::check_if_lvlup()
+{
+	int should_have_level = (get_character_exp()+ 250)/20;
+	if (should_have_level > get_character_level()) {
+		send_lvl_up_to_DB();
+		return true;
+	}
+	return false;
+}
+
+bool GuiHandler::add_exp(int ammount)
+{
+	sf::Packet to_send = sf::Packet();
+	to_send << 10 << current_picked_character << ammount;
+	network_handler->send_packet(to_send);
+	sf::Packet rec = sf::Packet();
+	rec = network_handler->recive_packet();
+	return true;
+}
+
+int GuiHandler::get_character_level()
+{
+	sf::Packet to_send = sf::Packet();
+	to_send << 14 << current_picked_character;
+	network_handler->send_packet(to_send);
+	sf::Packet received = network_handler->recive_packet();
+	int level;
+	received >> level;
+	return level;
+}
+
+int GuiHandler::get_character_exp()
+{
+	sf::Packet to_send = sf::Packet();
+	to_send << 15 << current_picked_character;
+	network_handler->send_packet(to_send);
+	sf::Packet received = network_handler->recive_packet();
+	int exp;
+	received >> exp;
+	return exp;
+}
+
+void GuiHandler::send_lvl_up_to_DB()
+{
+	
+	sf::Packet to_send = sf::Packet();
+	to_send << 9 << current_picked_character;
+	network_handler->send_packet(to_send);
+	network_handler->recive_packet();
 }

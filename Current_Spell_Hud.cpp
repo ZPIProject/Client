@@ -32,19 +32,19 @@ Current_Spell_Hud::Current_Spell_Hud(sf::Vector2f position, int spell, int eleme
 	switch (element)
 	{
 	case 1:
-		text.setColor(sf::Color::White);
+		text.setFillColor(sf::Color::White);
 		break;
 	case 4:
-		text.setColor(sf::Color(102, 51, 0));
+		text.setFillColor(sf::Color(102, 51, 0));
 		break;
 	case 5:
-		text.setColor(sf::Color::Red);
+		text.setFillColor(sf::Color::Red);
 		break;
 	case 6:
-		text.setColor(sf::Color::Yellow);
+		text.setFillColor(sf::Color::Yellow);
 		break;
 	case 9:
-		text.setColor(sf::Color::Blue);
+		text.setFillColor(sf::Color::Blue);
 		break;
 	default:
 		break;
@@ -102,19 +102,19 @@ void Current_Spell_Hud::setElement(int elementt)
 	switch (elementt)
 	{
 	case 1:
-		text.setColor(sf::Color::White);
+		text.setFillColor(sf::Color::White);
 		break;
 	case 4:
-		text.setColor(sf::Color(102, 51, 0));
+		text.setFillColor(sf::Color(102, 51, 0));
 		break;
 	case 5:
-		text.setColor(sf::Color::Red);
+		text.setFillColor(sf::Color::Red);
 		break;
 	case 6:
-		text.setColor(sf::Color::Yellow);
+		text.setFillColor(sf::Color::Yellow);
 		break;
 	case 9:
-		text.setColor(sf::Color::Blue);
+		text.setFillColor(sf::Color::Blue);
 		break;
 	default:
 		break;

@@ -100,9 +100,9 @@ void Tree::databaseUpdate(sf::Packet recived_packet) {
 		recived_packet >> skillid;
 		int idskill = std::stoi(skillid);
 		*/
-		setStatus(idskill -1, SOLD);
+		setStatus(idskill - 1, SOLD);
 		if (skillpoints > 0) {
-			std::vector<int> children = skills[idskill-1]->getChildren();
+			std::vector<int> children = skills[idskill - 1]->getChildren();
 			for (int i : children) {
 				change_to_avalible.push_back(i);
 			}

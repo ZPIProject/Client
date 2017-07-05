@@ -16,24 +16,28 @@
 #include "Status_Hud.h"
 #include "Current_Spell_Hud.h"
 
+#include "SoundManager.h"
+
 class GameManager
 {
+	SoundManager sounds;
+
 	bool want_to_run_with_connection_to_server = true;
 	bool is_pattern_drawn;
 	bool exited_from_game = false;
 	bool player_won = false;
 	bool end_game = false;
 
+
+
 	std::string current_username;
 	Pattern_management Pattern;
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
+	
 	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
 	
-	sf::Texture background_tex;
-	sf::Sprite background;
-
 	Separator* separator;
 
 	Player_Hud* hud;
@@ -52,6 +56,9 @@ class GameManager
 
 	Tree* tree;
 
+	sf::Clock local_shield_timer;
+	sf::Clock non_local_shield_timer; // zmieniæ na oppenent pewnie bedzie ³adniej wygl¹da³os
+
 	std::vector<Ball> balls_vector;
 	std::vector<Ball> balls_to_send;
 	std::vector<Trap> trap_vector;
@@ -66,7 +73,7 @@ class GameManager
 
 
 	NetworkHandler* network_handler;
-
+	Tree* tree;
 	CollisionHandler collision_handler;
 
 	Game_states current_game_state;
@@ -86,6 +93,8 @@ class GameManager
 	void managePattern();
 	void cast_spell();
 	void game_in_progress();
+	void check_win_condition();
+	void players_initialization();
 	
 	void pack_player(sf::Packet& packet_to_send);
 	void unpack_player(sf::Packet& recived_packet);
@@ -99,12 +108,27 @@ class GameManager
 	void pack_shield_object(sf::Packet& packet_to_send);
 	void unpack_shield_object(sf::Packet& packet_to_send);
 
-
 	void pack_all_and_send();
 	void recive_and_unpack_all();
 	void check_if_player_has_left();
+
+
+	sf::SoundBuffer ball;
+	sf::SoundBuffer trap;
+	sf::SoundBuffer step;
+	sf::Sound ball_sound;
+	sf::Sound trap_sound;
+	sf::Sound step_sound;
+
+	sf::Texture background_tex;
+	sf::Sprite background;
+
+
+
+
+
 public:
-	GameManager(NetworkHandler* network, sf::RenderWindow& window);
+	GameManager(NetworkHandler* network, sf::RenderWindow& window, Tree& tree);
 	~GameManager();
 
 	sf::Packet pack_maxHP();
@@ -114,6 +138,7 @@ public:
 	void setTree(Tree* tree) { this->tree = tree; }
 	void setEnemyStats(int maxHP) { stats1 = new Player_stats(maxHP, maxHP, 100, 100, 10, 100, 100, 100, 100, "Valium2"); }
 	bool get_player_win_status() { return player_won; }
+	void reset_game_has_ended() { end_game = false; }
 	void players_initialization();
 	void run();
 };

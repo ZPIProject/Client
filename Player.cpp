@@ -4,18 +4,23 @@
 #include "Spell_Headers\Trap.h"
 
 
-Player::Player(sf::Color players_color, float player_size, Player_stats* stts) : ColidableObject(new CircleCollider(player_size/2)),stats(stts)
+Player::Player(sf::Color players_color, float player_size, std::string path, Player_stats* stts) : ColidableObject(new CircleCollider(player_size/2)),stats(stts)
 {
+	texture.loadFromFile(path);
+	player_shape.setTexture(texture);
 	player_shape.setPosition(sf::Vector2f(0, 0));
-	player_shape.setFillColor(players_color);
-	player_shape.setRadius(player_size/2);
+	//player_shape.setFillColor(players_color);
+	//player_shape.setRadius(player_size/2);
 	player_shape.setOrigin(sf::Vector2f(player_size /2, player_size /2));
 	stats = stts;
 	stats->set_speed(3); // daæ to jako parametr i ewentualnie daæ metode setColor
 
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
-		circle->setPosition(player_shape.getPosition());
+		sf::Vector2f fixed_position;
+		fixed_position.x = player_shape.getPosition().x;
+		fixed_position.y = player_shape.getPosition().y;
+		circle->setPosition(fixed_position);
 		//std::cout << "Player_constructor: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
 	}
 }
@@ -31,6 +36,9 @@ void Player::setPosition(double x, double y)
 	player_shape.setPosition(x, y);
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
+		sf::Vector2f fixed_position;
+		fixed_position.x = x - (PLAYER_SIZE);
+		fixed_position.y = y;
 		circle->setPosition(player_shape.getPosition());
 	//	std::cout << "Player_setPosition: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
 	}
@@ -39,6 +47,14 @@ void Player::setPosition(double x, double y)
 void Player::setPosition(sf::Vector2f position)
 {
 	player_shape.setPosition(position);
+	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
+	{
+		sf::Vector2f fixed_position;
+		fixed_position.x = player_shape.getPosition().x;
+		fixed_position.y = player_shape.getPosition().y;
+
+		circle->setPosition(fixed_position);
+	}
 }
 
 void Player::setRotation(double rot)
@@ -71,6 +87,10 @@ void Player::move(int directionX, int directionY)
 
 	if (CircleCollider* circle = dynamic_cast<CircleCollider*>(collider))
 	{
+		sf::Vector2f fixed_position;
+		fixed_position.x = player_shape.getPosition().x;
+		fixed_position.y = player_shape.getPosition().y;
+
 		circle->setPosition(player_shape.getPosition());
 		//std::cout << "Player_movement: " << circle->getPosition().x << " " << circle->getPosition().y << "\n";
 	}
@@ -102,7 +122,7 @@ sf::Vector2f Player::getPosition()
 	return player_shape.getPosition();
 }
 
-sf::CircleShape Player::getShape()
+sf::Sprite Player::getShape()
 {
 	return player_shape;
 }

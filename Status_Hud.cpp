@@ -10,7 +10,7 @@ Status_Hud::Status_Hud()
 	text.setFont(font);
 	text.setCharacterSize(12);
 	text.setStyle(sf::Text::Italic);
-	text.setColor(sf::Color::Black);
+	text.setFillColor(sf::Color::Black);
 }
 
 Status_Hud::~Status_Hud()
