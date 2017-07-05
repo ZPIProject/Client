@@ -9,7 +9,7 @@
 class Player : public ColidableObject 
 {
 public:
-	Player(sf::Color players_color, float player_size, std::string path, Player_stats* stts);
+	Player(sf::Color players_color, float player_size,Player_stats* stts);
 	~Player();
 	
 	void setPosition(double x, double y);
@@ -21,7 +21,7 @@ public:
 	void rotate(sf::Vector2f mousePosition);
 
 	sf::Vector2f getPosition();
-	sf::Sprite getShape();
+	sf::CircleShape getShape();
 	
 	void onCollision(ColidableObject* object);
 
@@ -37,8 +37,7 @@ public:
 	Player_stats* getPlayerStats();
 
 private:
-	sf::Texture texture;
-	sf::Sprite player_shape;
+	sf::CircleShape player_shape;
 	Player_stats* stats;
 	std::vector<StatusStringHud> current_status;
 };

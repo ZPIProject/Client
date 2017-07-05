@@ -24,16 +24,16 @@ class GameManager
 	bool player_won = false;
 	bool end_game = false;
 
-
-
 	std::string current_username;
 	Pattern_management Pattern;
 	enum Game_states{LOGING_MENU, CONNECTING_TO_SERVER, MAIN_MENU, CONNECTING_TO_GAME, GAME_IN_PROGRES, EXITING_GAME, DISCONNECT};
 
-	
 	sf::RenderWindow* main_window;
 	sf::Clock frame_rate_controller;
 	
+	sf::Texture background_tex;
+	sf::Sprite background;
+
 	Separator* separator;
 
 	Player_Hud* hud;
@@ -85,7 +85,7 @@ class GameManager
 	void managePattern();
 	void cast_spell();
 	void game_in_progress();
-	void check_win_condition();
+
 	void players_initialization();
 	
 	void pack_player(sf::Packet& packet_to_send);
@@ -99,6 +99,9 @@ class GameManager
 
 	void pack_shield_object(sf::Packet& packet_to_send);
 	void unpack_shield_object(sf::Packet& packet_to_send);
+
+	void stats_to_send(int know, int wis, int vit);
+	std::vector<int> stats_recived();
 
 	void pack_all_and_send();
 	void recive_and_unpack_all();
